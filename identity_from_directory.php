@@ -60,6 +60,7 @@ class identity_from_directory extends rcube_plugin
 
                 $args['user_name'] = $user_name;
                 $args['email_list'] = [];
+                $args['email_default'] = '';
 
                 if (empty($args['user_email']) && strpos($user_email, '@')) {
                     $args['user_email'] = rcube_utils::idn_to_ascii($user_email);
@@ -90,6 +91,7 @@ class identity_from_directory extends rcube_plugin
                 }
 
                 $args['email_list'] = array_unique($args['email_list']);
+                $args['email_default'] = $args['user_email'];
 
             } elseif ($debug_plugin && count($results->records) > 1) {
                rcube::write_log('identity_from_directory_ldap', 'Searching for ' . $args['user'] . ' returned more then one result, all where ignored as unambiguous assignment is not possible.');
@@ -121,7 +123,39 @@ class identity_from_directory extends rcube_plugin
         }
 
         foreach ((array) $ldap_entry['email_list'] as $email) {
-           // FIXME implement identity creation and/or update
+            $hook_to_use = 'identity_create';
+            $identity_id = 0; // often called 'iid' in other parts of RC sources
+            $is_standard = 0; // 1: use the identity as default (there can only be one)
+
+            foreach ($identities as $identity) {
+                if ($identity['email'] == $email) {
+                    $hook_to_use = 'identity_update';
+                    $identity_id = $identity['identity_id'];
+                }
+            }
+
+            if (strtolower($ldap_entry['email_default']) == strtolower($email)) {
+                $is_standard = 1;
+            }
+
+            $plugin = $this->rc->plugins->exec_hook($hook_to_use, [
+                'id' => $identity_id,
+                'record' => [
+                    'user_id' => $this->rc->user->ID,
+                    'standard' => $is_standard,
+                    'email' => $email,
+                    'name' => (!empty($ldap_entry['name']) ? $ldap_entry['name'] : $ldap_entry['user_name']),
+                    'organization' => (array_key_exists('company', $ldap_entry) ? $ldap_entry['company'] : ''),
+                ],
+            ]);
+
+            if (!$plugin['abort'] && !empty($plugin['record']['email'])) {
+                if ($identity_id == 0) {
+                    $this->rc->user->insert_identity($plugin['record']);
+                } else {
+                    $this->rc->user->update_identity($identity_id, $plugin['record']);
+                }
+            }
         }
 
         return $args;

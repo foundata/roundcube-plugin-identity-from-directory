@@ -1,0 +1,82 @@
+<?php
+
+// identity_from_directory plugin settings
+
+// Parameters for connecting and searching in a LDAP or Active Directory.
+// A full example for Active Directory with the following characteristics
+//
+// 1. Connect to Domain Controller "dc01.contoso.com" with LDAPS on Port 636 (hosts).
+//    You can specify more than one as it is an array. They will be tried one after
+//    another.
+// 2. Use the "roundcube-svc" user located in the OU "service-accounts" to
+//    bind / connect (bind_dn) with a password (bind_pass)
+// 3. Search in all organization units units below DC=contoso,DC=com (base_dn, scope)
+// 4. Search only for active non-system user accounts (filter)
+// 5. Search in the the directory object attributes "mail" and "sAMAccountName"
+//    (search_fields) for the username of the current Roundcube username
+//    ($this->rc->user->data['username'])
+// 6. Define which directory object attributes to use for the Roundcube identity
+//    values and signature placeholders (fieldmap, the array keys are the names of
+//    the Roundcube values, the array values the corresponding directory attribute
+//    names to grab the data from)
+//
+// would result in the following plugin config value:
+//
+// $config['identity_from_directory_ldap'] = array(
+//   'hosts' => array('ldaps://dc01.contoso.com:636'),
+//   'base_dn' => 'DC=contoso,DC=com',
+//   'bind_dn' => 'CN=roundcube-svc,OU=service-accounts,DC=contoso,DC=com',
+//   'bind_pass' => 'password-of-service-user-defined-in-bind_dn',
+//   'scope' => 'sub', // search mode: sub|base|list
+//   'filter' => '(&(sAMAccountType=805306368)(!(servicePrincipalName=*))(!(isCriticalSystemObject=TRUE))(!(userAccountControl:1.2.840.113556.1.4.803:=2)))',
+//   'search_fields' => ['mail', 'sAMAccountName'],
+//   'fieldmap' => array(
+//     'name' => 'displayName',
+//     'email' => 'mail',
+//     'surname' => 'sn',
+//     'firstname' => 'givenName',
+//     'jobtitle' => 'title',
+//     'department' => 'department',
+//     'phone' => 'telephoneNumber',
+//     'fax' => 'facsimileTelephoneNumber',
+//     'website' => 'wWWHomePage',
+//     'company' => 'organization',
+//     'username' => 'sAMAccountName',
+//   ),
+// );
+$config['identity_from_directory_ldap'] = array(
+  'hosts' => array('ldaps://dc01.contoso.com:636'),
+  'base_dn' => 'DC=contoso,DC=com',
+  'bind_dn' => 'CN=roundcube-svc,OU=service-accounts,DC=contoso,DC=com',
+  'bind_pass' => 'password-of-service-user-defined-in-bind_dn',
+  'scope' => 'sub', // available search modes: sub|base|list
+  'filter' => '(&(sAMAccountType=805306368)(!(servicePrincipalName=*))(!(isCriticalSystemObject=TRUE))(!(userAccountControl:1.2.840.113556.1.4.803:=2)))',
+  'search_fields' => ['mail', 'sAMAccountName'],
+  'fieldmap' => array(
+    'name' => 'displayName',
+    'email' => 'mail',
+    'surname' => 'sn',
+    'firstname' => 'givenName',
+    'jobtitle' => 'title',
+    'department' => 'department',
+    'phone' => 'telephoneNumber',
+    'fax' => 'facsimileTelephoneNumber',
+    'website' => 'wWWHomePage',
+    'company' => 'organization',
+    'username' => 'sAMAccountName',
+  ),
+);
+
+
+// Active Directory only: Also search the 'proxyAddresses' field for email
+// alias addresses? This is an Actice Directory user attribute  which may
+// contain a CSV string like 'smtp:foo@exmaple.com,bar@example.net', listing
+// alias email addresses (if any). The plugin will also maintain identities
+// for them if the following config value is set to true.
+$config['identity_from_directory_handle_proxyaddresses'] = false;
+
+// In case of errors: Write LDAP search info, records and other useful
+// debugging information into the Roundcube log "identity_from_directory_ldap".
+// You might want to set $config['ldap_debug'] = true for logging Roundcube's
+// LDAP conversations, including the ones triggered by this plugin.
+$config['identity_from_directory_debug'] = false;

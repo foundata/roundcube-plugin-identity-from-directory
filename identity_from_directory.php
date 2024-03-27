@@ -197,17 +197,12 @@ class identity_from_directory extends rcube_plugin
                         $replace_url = urlencode($replace_raw);
                     }
 
-                    $signature = str_replace([
-                                                '%'. $fieldmap_key . '%',
-                                                '%'. $fieldmap_key . '_html%',
-                                                '%'. $fieldmap_key . '_url%',
-                                            ],
-                                            [
-                                                $replace_raw,
+                    $signature = str_replace([ '%'. $fieldmap_key . '%',
+                                               '%'. $fieldmap_key . '_html%',
+                                               '%'. $fieldmap_key . '_url%', ],
+                                             [  $replace_raw,
                                                 $replace_html,
-                                                $replace_url,
-                                            ], $signature);
-
+                                                $replace_url, ], $signature);
                 }
 
                 $identity_record['html_signature'] = ($use_html_sig) ? 1 : 0;

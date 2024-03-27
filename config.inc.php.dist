@@ -95,6 +95,7 @@ $config['identity_from_directory_fallbackvalues'] = [
 //        maintain the signature value and format in a self-reliant way)
 $config['identity_from_directory_handlesignatures'] = true;
 
+
 // Signature templates
 // You can use each key from $config['identity_from_directory_ldap']['fieldmap']
 // as %placeholder(_html|url)%. They will be replaced with the values from the

@@ -13,6 +13,7 @@ class identity_from_directory extends rcube_plugin
     private $rc;
     private $ldap;
 
+
     /**
      * Plugin initialization. API hooks binding.
      */
@@ -31,8 +32,9 @@ class identity_from_directory extends rcube_plugin
         $this->add_hook('login_after', [$this, 'login_after']);
     }
 
+
     /**
-     * 'user_create' hook handler.
+     * 'user_create' hook handler, used to grab and prepare the user data from LDAP
      */
     public function lookup_user_name($args)
     {
@@ -49,14 +51,14 @@ class identity_from_directory extends rcube_plugin
             // as connection property by $this->init_ldap(). So searching in '*' limits the field to the plugin's config.
             $results = $this->ldap->search('*', $args['user'], true);
 
-            if (count($results->records) == 1) {
-                $user = $results->records[0];
+            if (count($results->records) === 1) {
+                $ldap_entry = $results->records[0];
                 if ($debug_plugin) {
-                    rcube::write_log('identity_from_directory_ldap', 'Found a record for' . $args['user'] . ': '.print_r($user, true));
+                    rcube::write_log('identity_from_directory_ldap', 'Found a record for' . $args['user'] . ': '.print_r($ldap_entry, true));
                 }
 
-                $user_name = is_array($user['name']) ? $user['name'][0] : $user['name'];
-                $user_email = is_array($user['email']) ? $user['email'][0] : $user['email'];
+                $user_name = is_array($ldap_entry['name']) ? $ldap_entry['name'][0] : $ldap_entry['name'];
+                $user_email = is_array($ldap_entry['email']) ? $ldap_entry['email'][0] : $ldap_entry['email'];
 
                 $args['user_name'] = $user_name;
                 $args['email_list'] = [];
@@ -70,23 +72,30 @@ class identity_from_directory extends rcube_plugin
                     $args['email_list'][] = $args['user_email'];
                 }
 
-                foreach (array_keys($user) as $key) {
+                foreach (array_keys($ldap_entry) as $key) {
+                    // add email addresses (main, aliases) to to the list for the user
                     if (preg_match('/^email($|:)/', $key)) {
-                        foreach ((array) $user[$key] as $alias) {
+                        foreach ((array) $ldap_entry[$key] as $alias) {
                             if (strpos($alias, '@')) {
                                 $args['email_list'][] = rcube_utils::idn_to_ascii($alias);
                             }
                         }
-                    // parse Active Directory attribute proxyAddresses, CSV string like 'smtp:foo@exmaple.com,bar@example.net'
                     } elseif ($ad_handle_proxyaddresses &&
                               preg_match('/^proxyaddresses($|:)/', $key)) {
-                        $proxyaddresses = explode(',', $user[$key]);
+                        // parse Active Directory attribute proxyAddresses, CSV string like 'smtp:foo@exmaple.com,bar@example.net'
+                        $proxyaddresses = rcube_utils::explode(',', $ldap_entry[$key]);
                         foreach ((array) $proxyaddresses as $alias) {
+                            if (empty($alias)) {
+                                continue;
+                            }
                             $alias = preg_replace('/^smtp:(.+)/', '\1', $alias, 1);
-                            if (strpos($alias, '@')) {
+                            if (strpos($alias, '@') !== false) {
                                 $args['email_list'][] = rcube_utils::idn_to_ascii($alias);
                             }
                         }
+                    // add LDAP data as long as it does not overwrite already existing keys and exclude _ID, _raw_attrib etc.)
+                    } elseif (strpos($key, '_') !== 0 && !array_key_exists($key, $args)) {
+                        $args[$key] = $ldap_entry[$key];
                     }
                 }
 
@@ -101,8 +110,9 @@ class identity_from_directory extends rcube_plugin
         return $args;
     }
 
+
     /**
-     * 'login_after' hook handler.
+     * 'login_after' hook handler, used to create or update the user identities
      */
     public function login_after($args)
     {
@@ -113,44 +123,104 @@ class identity_from_directory extends rcube_plugin
         }
 
         $identities = $this->rc->user->list_emails();
-        $ldap_entry = $this->lookup_user_name([
+        $user_data = $this->lookup_user_name([
             'user' => $this->rc->user->data['username'],
             'mail_host' => $this->rc->user->data['mail_host'],
         ]);
 
-        if (empty($ldap_entry['email_list'])) {
+        if (empty($user_data['email_list'])) {
             return $args;
         }
 
-        foreach ((array) $ldap_entry['email_list'] as $email) {
+        $ldap_config = (array) $this->rc->config->get('identity_from_directory_ldap');
+        $handle_sigs = (bool) $this->rc->config->get('identity_from_directory_handlesignatures');
+        $use_html_sig = (bool) $this->rc->config->get('identity_from_directory_htmlsignature');
+        $wash_html_sig = (bool) $this->rc->config->get('identity_from_directory_washhtmlsignature');
+        if ($use_html_sig) {
+            $signature = (string) $this->rc->config->get('identity_from_directory_signature_template_html');
+        } else {
+            $signature = (string) $this->rc->config->get('identity_from_directory_signature_template_plaintext');
+        }
+        $sig_fallback_values = (array) $this->rc->config->get('identity_from_directory_fallbackvalues');
+
+        foreach ((array) $user_data['email_list'] as $email) {
             $hook_to_use = 'identity_create';
             $identity_id = 0; // often called 'iid' in other parts of RC sources
             $is_standard = 0; // 1: use the identity as default (there can only be one)
 
             foreach ($identities as $identity) {
-                if ($identity['email'] == $email) {
+                if ($identity['email'] === $email) {
                     $hook_to_use = 'identity_update';
                     $identity_id = $identity['identity_id'];
+                    break;
                 }
             }
 
-            if (strtolower($ldap_entry['email_default']) == strtolower($email)) {
+            if (strtolower($user_data['email_default']) === strtolower($email)) {
                 $is_standard = 1;
+            }
+
+            // see https://github.com/roundcube/roundcubemail/blob/master/program/actions/settings/identity_save.php for available keys
+            $identity_record = [
+                'user_id' => $this->rc->user->ID,
+                'standard' => $is_standard,
+                'name' => (!empty($user_data['name']) ? $user_data['name'] : $user_data['user_name']),
+                'email' => $email,
+                'organization' => (array_key_exists('organization', $user_data) ? $user_data['organization'] : ''),
+            ];
+
+            if ($handle_sigs) {
+                // add signature to identity record, replace placeholders in a signature template with the values
+                // from LDAP or $config['identity_from_directory_fallbackvalues']:
+                // - %foo%: raw value of field 'foo'
+                // - %foo_html%: HTML entities encoded value of field 'foo'
+                // - %foo_url%: URL encoded value of field 'foo'
+                foreach (array_keys($ldap_config['fieldmap']) as $fieldmap_key) {
+                    $replace_raw = '';
+                    if (array_key_exists($fieldmap_key, $user_data) && ((string) $user_data[$fieldmap_key] !== '')) {
+                        $replace_raw = (string) $user_data[$fieldmap_key];
+                    } elseif (array_key_exists($fieldmap_key, $sig_fallback_values) && ((string) $sig_fallback_values[$fieldmap_key] !== '')) {
+                        $replace_raw = (string) $sig_fallback_values[$fieldmap_key];
+                    } elseif (array_key_exists($fieldmap_key, $identity_record) && ((string) $identity_record[$fieldmap_key] !== '')) {
+                        $replace_raw = (string) $identity_record[$fieldmap_key];
+                    } else {
+                        continue;
+                    }
+
+                    $replace_html = '';
+                    $replace_html = htmlspecialchars($replace_raw, ENT_NOQUOTES, RCUBE_CHARSET);
+
+                    $replace_url = '';
+                    if ($fieldmap_key === 'phone' || $fieldmap_key === 'fax') {
+                        $replace_url = urlencode(preg_replace('/[^+0-9]+/', '', $replace_raw)); // strip some chars for "tel://" URL usage
+                    } else {
+                        $replace_url = urlencode($replace_raw);
+                    }
+
+                    $signature = str_replace([
+                                                '%'. $fieldmap_key . '%',
+                                                '%'. $fieldmap_key . '_html%',
+                                                '%'. $fieldmap_key . '_url%',
+                                            ],
+                                            [
+                                                $replace_raw,
+                                                $replace_html,
+                                                $replace_url,
+                                            ], $signature);
+
+                }
+
+                $identity_record['html_signature'] = ($use_html_sig) ? 1 : 0;
+                $identity_record['signature'] = ($use_html_sig && $wash_html_sig) ? rcmail_action_settings_index::wash_html($signature) : $signature; // XSS protection
             }
 
             $plugin = $this->rc->plugins->exec_hook($hook_to_use, [
                 'id' => $identity_id,
-                'record' => [
-                    'user_id' => $this->rc->user->ID,
-                    'standard' => $is_standard,
-                    'email' => $email,
-                    'name' => (!empty($ldap_entry['name']) ? $ldap_entry['name'] : $ldap_entry['user_name']),
-                    'organization' => (array_key_exists('company', $ldap_entry) ? $ldap_entry['company'] : ''),
-                ],
+                'record' => $identity_record,
             ]);
 
             if (!$plugin['abort'] && !empty($plugin['record']['email'])) {
-                if ($identity_id == 0) {
+                if ($identity_id === 0) {
                     $this->rc->user->insert_identity($plugin['record']);
                 } else {
                     $this->rc->user->update_identity($identity_id, $plugin['record']);
@@ -160,6 +230,7 @@ class identity_from_directory extends rcube_plugin
 
         return $args;
     }
+
 
     /**
      * Initialize LDAP backend connection
@@ -172,7 +243,7 @@ class identity_from_directory extends rcube_plugin
         }
 
         // Get config and set some fallback / default values
-        // See this plugin's config.php.dist for a detailled description of the important settings
+        // See this plugin's config.php.dist for a detailled description of the settings
         $this->load_config();
 
         $debug_plugin = $this->rc->config->get('identity_from_directory_debug');
@@ -194,11 +265,19 @@ class identity_from_directory extends rcube_plugin
             }
             return false;
         }
+        if (!array_key_exists('name', $ldap_config['fieldmap']) ||
+            !array_key_exists('email', $ldap_config['fieldmap']) ||
+            !array_key_exists('organization', $ldap_config['fieldmap'])) {
+            if ($debug_plugin) {
+                rcube::write_log('identity_from_directory_ldap', 'The plugin config seems to be invalid, please check $config[\'identity_from_directory_ldap\'][\'fieldmap\'].');
+            }
+            return false;
+        }
 
         // add mapping for the "proxyAddresses" attribute (which stores email aliases when using Active Directory)
         $ad_handle_proxyaddresses = $this->rc->config->get('identity_from_directory_handle_proxyaddresses');
         if ($ad_handle_proxyaddresses) {
-            $ldap_config['fieldmap']['proxyaddresses'] = 'ProxyAddresses';
+            $ldap_config['fieldmap']['proxyaddresses'] = 'proxyAddresses';
         }
 
         // connect to the directory

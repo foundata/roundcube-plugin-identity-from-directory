@@ -2,7 +2,7 @@
 
 // identity_from_directory plugin settings
 
-// Parameters for connecting and searching in a LDAP or Active Directory.
+// Parameters for connecting to and searching in LDAP or Active Directory.
 // A full example for Active Directory with the following characteristics
 //
 // 1. Connect to Domain Controller "dc01.contoso.com" with LDAPS on Port 636 (hosts).
@@ -45,27 +45,93 @@
 //   ),
 // );
 $config['identity_from_directory_ldap'] = array(
-  'hosts' => array('ldaps://dc01.contoso.com:636'),
-  'base_dn' => 'DC=contoso,DC=com',
-  'bind_dn' => 'CN=roundcube-svc,OU=service-accounts,DC=contoso,DC=com',
-  'bind_pass' => 'password-of-service-user-defined-in-bind_dn',
-  'scope' => 'sub', // available search modes: sub|base|list
-  'filter' => '(&(sAMAccountType=805306368)(!(servicePrincipalName=*))(!(isCriticalSystemObject=TRUE))(!(userAccountControl:1.2.840.113556.1.4.803:=2)))',
-  'search_fields' => ['mail', 'sAMAccountName'],
-  'fieldmap' => array(
-    'name' => 'displayName',
-    'email' => 'mail',
-    'surname' => 'sn',
-    'firstname' => 'givenName',
-    'jobtitle' => 'title',
-    'department' => 'department',
-    'phone' => 'telephoneNumber',
-    'fax' => 'facsimileTelephoneNumber',
-    'website' => 'wWWHomePage',
-    'company' => 'organization',
-    'username' => 'sAMAccountName',
-  ),
+    'hosts' => array('ldaps://dc01.contoso.com:636'),
+    'base_dn' => 'DC=contoso,DC=com',
+    'bind_dn' => 'CN=roundcube-svc,OU=service-accounts,DC=contoso,DC=com',
+    'bind_pass' => 'password-of-service-user-defined-in-bind_dn',
+    'scope' => 'sub', // available search modes: sub|base|list
+    'filter' => '(&(sAMAccountType=805306368)(!(servicePrincipalName=*))(!(isCriticalSystemObject=TRUE))(!(userAccountControl:1.2.840.113556.1.4.803:=2)))',
+    'search_fields' => ['mail', 'sAMAccountName'],
+    // fieldmap:
+    // - key: value name in Roundcube
+    // - values: corresponding attribute name in your LDAP
+    //
+    // You can use the mapped fields keys (e.g. 'foo") as placeholders in
+    // $config['identity_from_directory_signature_template_plaintext'] and
+    // $config['identity_from_directory_signature_template_html']). See the
+    // comment there for details.
+    'fieldmap' => array(
+        // mandatory RC identity fields
+        'name' => 'displayName',
+        'email' => 'mail',
+        'organization' => 'company',
+        // additional data
+        'surname' => 'sn',
+        'firstname' => 'givenName',
+        'jobtitle' => 'title',
+        'department' => 'department',
+        'phone' => 'telephoneNumber',
+        'fax' => 'facsimileTelephoneNumber',
+        'website' => 'wWWHomePage',
+        'username' => 'sAMAccountName',
+    ),
 );
+
+
+// optional fallback values which will be used if a LDAP attribute defined
+// in $config['identity_from_directory_ldap']['fieldmap'] provides no / empty
+// data. Just remove or add keys you do (not) need to have a fallback value for.
+$config['identity_from_directory_fallbackvalues'] = [
+    'organization' => 'ACME Inc.',
+    'phone' => '+49 123 123 123',
+    //'fax' => '+49 123 123 999',
+    'website' => 'https://example.com/',
+];
+
+
+// Switch for signature handling
+// true: overwrite existing signatures on each login
+// false: do not touch / overwrite the signature of an identity (a user can still
+//        maintain the signature value and format in a self-reliant way)
+$config['identity_from_directory_handlesignatures'] = true;
+
+// Signature templates
+// You can use each key from $config['identity_from_directory_ldap']['fieldmap']
+// as %placeholder(_html|url)%. They will be replaced with the values from the
+// either the directory or $config['identity_from_directory_fallbackvalues'] (if
+// there is no or empty data for this value in LDAP). Each value is available in
+// three ways (as provided by LDAP, with encoded HTML entities and URL encoded
+// for using it in URLs).
+//
+// Example for 'foo':
+// - %foo%: raw value of field 'foo'
+// - %foo_html%: HTML entities encoded value of field 'foo'
+// - %foo_url%: URL encoded value of field 'foo'
+//
+// $config['identity_from_directory_signature_template_plaintext'] will be used
+// if $config['identity_from_directory_htmlsignature'] is false.
+$config['identity_from_directory_signature_template_html'] = '
+<p>
+    Kind regards<br />
+    <strong>%name_html%</strong><br />
+    %organization_html%
+</p>
+<p>
+    mailto: <a href="mailto:%email_html%">%email_html%</a><br />
+    phone: <a href="tel:%phone_url%">%phone_html%</a><br />
+    web: <a href="%website_html%">%website_html%</a>
+</p>
+';
+
+$config['identity_from_directory_signature_template_plaintext'] = '
+Kind regards
+%name%
+%organization%
+
+mailto: %email%
+phone: %phone%
+web: %website%
+';
 
 
 // Active Directory only: Also search the 'proxyAddresses' field for email
@@ -74,6 +140,19 @@ $config['identity_from_directory_ldap'] = array(
 // alias email addresses (if any). The plugin will also maintain identities
 // for them if the following config value is set to true.
 $config['identity_from_directory_handle_proxyaddresses'] = false;
+
+
+// Switch for signature format
+// true: use HTML instead of plain text signatures
+$config['identity_from_directory_htmlsignature'] = true;
+
+
+// Switch for signature sanitation
+// true: use rcmail_action_settings_index::wash_html() on HTML signatures.
+// You can disable this if you got problems with stripped HTML attributes
+// and you are sure that one you trust the LDAP data.
+$config['identity_from_directory_washhtmlsignature'] = true;
+
 
 // In case of errors: Write LDAP search info, records and other useful
 // debugging information into the Roundcube log "identity_from_directory_ldap".

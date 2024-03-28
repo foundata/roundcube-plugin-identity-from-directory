@@ -1,15 +1,15 @@
 # Roundcube Plugin: `identity_from_directory` (use LDAP or AD to maintain email identities)
 
-A [Roundcube](https://roundcube.net/) [plugin](https://plugins.roundcube.net/) which allows you to maintain email identities of users automatically on each login, based on their data in a directory (LDAP or Active Directory).
+A [Roundcube](https://roundcube.net/) [plugin](https://plugins.roundcube.net/) to populate and maintain a user's email identities automatically on each login, based on corresponding LDAP or Active Directory data.
 
 
 ## Table of Contents
 
 - [Installation](#installation)
-  - [Installation using composer](#installation-using-composer)
+  - [Installation using Composer](#installation-using-composer)
   - [Installation from source or release tarball](#installation-from-source-or-release-tarball)
 - [Updating](#updating)
-  - [Update using composer](#update-using-composer)
+  - [Update using Composer](#update-using-composer)
   - [Update from source or release tarball](#update-from-source-or-release-tarball)
 - [Configuration](#configuration)
 - [Compatibility](#compatibility)
@@ -19,19 +19,19 @@ A [Roundcube](https://roundcube.net/) [plugin](https://plugins.roundcube.net/) w
 
 ## Installation
 
-### Installation using composer
+### Installation using Composer
 
 A package and release is in preparation but not done yet.
 
 
 ### Installation from source or release tarball
 
-Simply place the plugin source code in `plugins/identity_from_directory/`. Edit the main Roundcube config file to add `identity_from_directory` to the plugins array.
+Simply place the plugin source code in `plugins/identity_from_directory/`. Add `identity_from_directory` to Roundcube's `$config['plugins']` array afterwards.
 
 
 ## Updating
 
-### Update using composer
+### Update using Composer
 
 A package and release is in preparation but not done yet.
 
@@ -43,7 +43,7 @@ Updating is as simple as overwriting the file. Just follow the [installation ins
 
 ## Configuration
 
-- Copy the template `config.inc.php.dist` to `config.inc.php` (composer may already have done this for you)
+- Copy the template `config.inc.php.dist` to `config.inc.php` (Composer may already have done this for you)
 - Edit `plugins/identity_from_directory/config.inc.php` as you need. The inline comments in the file will help you with that.
 
 

@@ -1,0 +1,48 @@
+{
+    "name": "foundata/identity_from_directory",
+    "description": "Populate and maintain user identities automatically on each login, based on corresponding LDAP or Active Directory user data.",
+    "license": "GPL-3.0-or-later",
+    "type": "roundcube-plugin",
+    "keywords": [
+        "identity",
+        "signature",
+        "ldap",
+        "active-directory",
+        "addressbook",
+        "contacts"
+    ],
+    "authors": [
+        {
+            "name": "Andreas Haerter",
+            "email": "ah@foundata.com",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "https://github.com/foundata/roundcube-plugin-identity-from-directory/",
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "roundcube/plugin-installer": "^0.3"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://plugins.roundcube.net"
+        }
+    ],
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "roundcube/plugin-installer": true
+        },
+        "roundcube": {
+            "enable-plugin": true,
+            "uninstall-remove-folder": true
+        }
+    },
+    "extra": {
+        "roundcube": {
+            "min-version": "1.6.0"
+        }
+    }
+}

@@ -48,7 +48,7 @@ Nothing automated yet, therefore at least manual instructions:
    git stash
 
    # create a temporary branch to create a release tarball including
-   # all dependencies while respecting .gitignore and .gitattributes
+   # dependencies (if any)
    git checkout -b "v${version}-release" "tags/v${version}"
 
    # The only dependency currently is "roundcube/plugin-installer" which
@@ -60,13 +60,19 @@ Nothing automated yet, therefore at least manual instructions:
    #  git add "./.gitignore" "./composer.json" "./composer.lock" "./vendor/." && \
    #  git commit -m "Add PHP dependencies"
 
+   # create the tarball (archive is respecting .gitignore and .gitattributes)
    git archive --verbose \
      --format="tar.gz" \
      --prefix="identity_from_directory/" \
      --output="../identity_from_directory-v${version}.tar.gz" \
      HEAD "./"
 
-   # go back and clean-up
+   # create a checksums file
+   pushd "$(pwd)" && cd ..
+   sha256sum "identity_from_directory-v${version}.tar.gz" > "./identity_from_directory-v${version}.tar.gz.sha256"
+   popd
+
+   # change back to original branch and clean-up
    git checkout "${branch}"
    git stash pop
    git branch --delete --force "v${version}-release"
@@ -91,7 +97,16 @@ Nothing automated yet, therefore at least manual instructions:
     -H "X-GitHub-Api-Version: 2022-11-28" \
     -H "Content-Type: application/octet-stream" \
     "https://uploads.github.com/repos/foundata/roundcube-plugin-identity-from-directory/releases/${release_id}/assets?name=identity_from_directory-v${version}.tar.gz" \
-      --data-binary "@../identity_from_directory-v${version}.tar.gz"
+    --data-binary "@../identity_from_directory-v${version}.tar.gz"
+
+   curl -L \
+    -X POST \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer ${github_api_token}" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    -H "Content-Type: text/plain;charset=UTF-8" \
+    "https://uploads.github.com/repos/foundata/roundcube-plugin-identity-from-directory/releases/${release_id}/assets?name=identity_from_directory-v${version}.tar.gz.sha256" \
+    --data-binary "@../identity_from_directory-v${version}.tar.gz.sha256"
 
    unset github_api_token
    ```

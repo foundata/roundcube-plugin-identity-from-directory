@@ -57,8 +57,8 @@ Nothing automated yet, therefore at least manual instructions:
    # following code if there are real runtime dependencies some day:
    #sed -i -E -e '/^\/vendor\/$/d' "./.gitignore"
    #composer update --no-dev && \
-   #  git add "./.gitignore" "./composer.json" "./composer.lock" "./vendor/." && \
-   #  git commit -m "Add PHP dependencies"
+   #git add "./.gitignore" "./composer.json" "./composer.lock" "./vendor/." && \
+   #git commit -m "Add PHP dependencies"
 
    # create the tarball (archive is respecting .gitignore and .gitattributes)
    git archive --verbose \

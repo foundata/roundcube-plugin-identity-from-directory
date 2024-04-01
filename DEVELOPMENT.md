@@ -61,8 +61,8 @@ Nothing automated yet, therefore at least manual instructions:
 
    # go back and clean-up
    git checkout "${branch}"
-   git pop
-   git --delete --force "v${version}-release"
+   git stash pop
+   git branch --delete --force "v${version}-release"
    ```
    `git archive` respects `.gitignore` as well as `.gitattributes`.
 6. Use [GitHub's release feature](https://github.com/foundata/roundcube-plugin-identity-from-directory/releases/new), select the tag you pushed and create a new release:

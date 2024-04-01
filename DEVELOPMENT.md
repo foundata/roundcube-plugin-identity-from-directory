@@ -50,9 +50,16 @@ Nothing automated yet, therefore at least manual instructions:
    # create a temporary branch to create a release tarball including
    # all dependencies while respecting .gitignore and .gitattributes
    git checkout -b "v${version}-release" "tags/v${version}"
-   composer update --no-dev && \
-     git add "./composer.json" "./vendor/." && \
-     git commit -m "Add PHP dependencies"
+
+   # The only dependency currently is "roundcube/plugin-installer" which
+   # is solely needed during a Composer based installation process. It
+   # is unnecessary in stand-alone release tarballs. You can use the
+   # following code if there are real runtime dependencies some day:
+   #sed -i -E -e '/^\/vendor\/$/d' "./.gitignore"
+   #composer update --no-dev && \
+   #  git add "./.gitignore" "./composer.json" "./composer.lock" "./vendor/." && \
+   #  git commit -m "Add PHP dependencies"
+
    git archive --verbose \
      --format="tar.gz" \
      --prefix="identity_from_directory/" \
@@ -68,18 +75,37 @@ Nothing automated yet, therefore at least manual instructions:
 6. Use [GitHub's release feature](https://github.com/foundata/roundcube-plugin-identity-from-directory/releases/new), select the tag you pushed and create a new release:
    * Use `v<version>` as title.
    * A description is optional. In doubt, use `See CHANGELOG.md for more information about this release.`.
-   * Add the created release tarball as additional file attachment.
 7. Check if the GitHub API delivers the correct version as `latest`:
    ```console
    curl -s -L https://api.github.com/repos/foundata/roundcube-plugin-identity-from-directory/releases/latest | jq -r '.tag_name' | sed -e 's/^v//g'
    ```
-8. Inform [Packist](https://packagist.org/) about the new release:
+8. Add the created release tarball as [additional asset](https://docs.github.com/en/enterprise-cloud@latest/rest/releases/assets#upload-a-release-asset) / file attachment:
    ```console
-   curl \
+   github_api_token="FIXME"
+   release_id="$(curl -s -L https://api.github.com/repos/foundata/roundcube-plugin-identity-from-directory/releases/latest | jq -r '.id')"
+
+   curl -L \
+    -X POST \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer ${github_api_token}" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    -H "Content-Type: application/octet-stream" \
+    "https://uploads.github.com/repos/foundata/roundcube-plugin-identity-from-directory/releases/${release_id}/assets?name=identity_from_directory-v${version}.tar.gz" \
+      --data-binary "@../identity_from_directory-v${version}.tar.gz"
+
+   unset github_api_token
+   ```
+9. Inform [Packist](https://packagist.org/) about the new release:
+   ```console
+   packagist_api_token="FIXME"
+
+   curl -L \
      -X POST \
      -H "Content-Type: application/json" \
      -d '{"repository":{"url":"https://github.com/foundata/roundcube-plugin-identity-from-directory"}}' \
-     'https://packagist.org/api/update-package?username=foundata&apiToken=FIXME'
+     "https://packagist.org/api/update-package?username=foundata&apiToken=${packagist_api_token}"
+
+   unset packagist_api_token
    ```
 
 

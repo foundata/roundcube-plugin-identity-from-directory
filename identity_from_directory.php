@@ -132,8 +132,10 @@ class identity_from_directory extends rcube_plugin
             return $args;
         }
 
+        $debug_plugin = $this->rc->config->get('identity_from_directory_debug');
         $ldap_config = (array) $this->rc->config->get('identity_from_directory_ldap');
-        $handle_sigs = (bool) $this->rc->config->get('identity_from_directory_updatesignatures');
+        $delete_unmanaged = (bool) $this->rc->config->get('identity_from_directory_deleteunmanaged');
+        $update_sigs = (bool) $this->rc->config->get('identity_from_directory_updatesignatures');
         $use_html_sig = (bool) $this->rc->config->get('identity_from_directory_htmlsignature');
         $wash_html_sig = (bool) $this->rc->config->get('identity_from_directory_washhtmlsignature');
         if ($use_html_sig) {
@@ -169,7 +171,7 @@ class identity_from_directory extends rcube_plugin
                 'organization' => (array_key_exists('organization', $user_data) ? $user_data['organization'] : ''),
             ];
 
-            if ($handle_sigs) {
+            if ($update_sigs) {
                 // add signature to identity record, replace placeholders in a signature template with the values
                 // from LDAP or $config['identity_from_directory_fallbackvalues']:
                 // - %foo%: raw value of field 'foo'
@@ -219,6 +221,22 @@ class identity_from_directory extends rcube_plugin
                     $this->rc->user->insert_identity($plugin['record']);
                 } else {
                     $this->rc->user->update_identity($identity_id, $plugin['record']);
+                }
+            }
+        }
+
+        if ($delete_unmanaged) {
+            $identities_count = count($identities);
+            foreach ($identities as $identity) {
+                if ($identities_count > 1 && !(in_array($identity['email'], $user_data['email_list']))) {
+                    if ($debug_plugin) {
+                        rcube::write_log('identity_from_directory_ldap', 'Deleting identity '. $identity['identity_id']. ' of user '.  $this->rc->user->data['username'] .' because it\'s email '. $identity['email'] .' is the not listed in the directory.');
+                    }
+
+                    if (!($this->rc->user->delete_identity($identity['identity_id'])) && $debug_plugin) {
+                        rcube::write_log('identity_from_directory_ldap', 'Could note delete identity '. $identity['identity_id']. ' for email '. $identity['email']);
+                    }
+                    $identities_count--;
                 }
             }
         }

@@ -89,6 +89,19 @@ $config['identity_from_directory_fallbackvalues'] = [
 ];
 
 
+// Switch to control if unmanaged identities should be deleted.
+// true: Delete all identities without a matching email address in the user's
+//       LDAP dataset. Recommended for automatic housekeeping in most
+//       environments after everything is working for you as expected.
+// false: Do not delete identities if there is no fitting email address in
+//        in LDAP. These identities will stay untouched until users delete them
+//        by themselves or the identity gets updated because the email addresses
+//        was added to a user's LDAP data. It makes sense to start with false
+//        to prevent unwanted deletions on running systems until you are sure
+//        that all identities should be defined by LDAP data, no matter what.
+$config['identity_from_directory_deleteunmanaged'] = false;
+
+
 // Switch for signature handling
 // true: overwrite existing signatures on each login
 // false: do not touch / overwrite the signature of an identity (a user can still

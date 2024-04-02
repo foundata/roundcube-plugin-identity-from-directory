@@ -6,11 +6,11 @@ A [Roundcube](https://roundcube.net/) [plugin](https://plugins.roundcube.net/) t
 ## Table of Contents
 
 - [Installation](#installation)
-  - [Installation from release tarball](#installation-from-release-tarball)
   - [Installation using Composer](#installation-using-composer)
+  - [Installation from release tarball](#installation-from-release-tarball)
 - [Updating](#updating)
-  - [Update from release tarball](#update-from-release-tarball)
   - [Update using Composer](#update-using-composer)
+  - [Update from release tarball](#update-from-release-tarball)
 - [Configuration](#configuration)
 - [Compatibility](#compatibility)
 - [Licensing, copyright](#licensing-copyright)
@@ -19,9 +19,24 @@ A [Roundcube](https://roundcube.net/) [plugin](https://plugins.roundcube.net/) t
 
 ## Installation
 
+### Installation using Composer
+
+The following command installs the plugin via [Composer](https://getcomposer.org/download/) into `plugins/identity_from_directory`:
+
+```bash
+php composer.phar require --update-no-dev -o "foundata/identity_from_directory:*"`
+```
+
+If you want to use the current development version from Git, use `-o "foundata/identity_from_directory:dev-main"`. Please confirm with `y` when Composer asks you whether you want to enable the plugin in the Roundcube configuration. Alternatively, add `identity_from_directory` to Roundcube's `$config['plugins']` array by hand.
+
+You can now [configure](#configuration) the plugin.
+
+
 ### Installation from release tarball
 
-Download the latest [`identity_from_directory-vX.Y.Z.tar.gz` tarball](https://github.com/foundata/roundcube-plugin-identity-from-directory/releases) (do not use the "Source code" archives Github creates automatically for each release). Extract it into `plugins/`, all source code files has to be in `plugins/identity_from_directory/` afterwards. Useful snippet if you have got a shell available on your target server:
+Download the latest [`identity_from_directory-vX.Y.Z.tar.gz` tarball](https://github.com/foundata/roundcube-plugin-identity-from-directory/releases) (do not use the "Source code" archives Github creates automatically for each release). Extract it into `plugins/`, all files have to be in `plugins/identity_from_directory/` afterwards.
+
+Useful snippet if you have got a shell available on your target server:
 
 ```bash
 # set Rouncube's installation path, adapt if needed
@@ -42,25 +57,7 @@ cd "${roundcube_install_dir}/plugins" && tar -xzvf "/tmp/identity_from_directory
 [Configure](#configuration) the plugin and add `identity_from_directory` to Roundcube's `$config['plugins']` array to enable it.
 
 
-### Installation using Composer
-
-The following command installs the plugin via [Composer](https://getcomposer.org/download/) into `plugins/identity_from_directory`:
-
-```bash
-php composer.phar require --update-no-dev -o "foundata/identity_from_directory:*"`
-```
-
-If you want to use the current development version from Git, use `-o "foundata/identity_from_directory:dev-main"`. Please confirm with `y` when Composer asks you whether you want to enable the plugin in the Roundcube configuration. Alternatively, add `identity_from_directory` to Roundcube's `$config['plugins']` array by hand.
-
-You can now [configure](#configuration) the plugin.
-
-
 ## Updating
-
-### Update from release tarball
-
-Updating is as simple as overwriting the existing files. Just follow the [installation instructions](#installation) again to get the newest release. This should be a low-risk operation as there were no backwards-compatibility-breaking releases yet and there are no database schema changes.
-
 
 ### Update using Composer
 
@@ -69,6 +66,10 @@ The following command updates the plugin via [Composer](https://getcomposer.org/
 ```bash
 php composer.phar update --no-dev -o "foundata/identity_from_directory:*"`
 ```
+
+### Update from release tarball
+
+Updating is as simple as overwriting the existing files. Just follow the [installation instructions](#installation) again to get the newest release. This should be a low-risk operation as there were no backwards-compatibility-breaking releases yet and there are no database schema changes.
 
 
 ## Configuration
@@ -79,9 +80,9 @@ php composer.phar update --no-dev -o "foundata/identity_from_directory:*"`
 Some additional notes:
 
 * All **plugin actions are only triggered during a user's login**. So logout and login again to test a new configuration.
-* This plugin is technically compatible with all values of Roundcube's `$config['identities_level']` config option. However, a value of `1` (user can edit all params but not the email address as well as add or delete identities in the UI) or `3` (user can edit all params but not the email address and cannot add or delete identities in the UI) usually makes most sense.
-* Set `$config['identity_from_directory_deleteunmanaged'] = true` if you want to delete propably unwanted identities automatically.
-* Set `$config['identity_from_directory_handle_proxyaddresses'] = true` to support searching for alias addressen in Active Directory's `proxyAddresses` field. It may contain a CSV string like `smtp:foo@exmaple.com,smtp:bar@example.net`.
+* This plugin is technically **compatible with all values of Roundcube's `$config['identities_level']`** config option. However, a value of `1` (user can edit all params but not the email address as well as add or delete identities in the UI) or `3` (user can edit all params but not the email address and cannot add or delete identities in the UI) makes most sense.
+* Set `$config['identity_from_directory_deleteunmanaged'] = true` if you want to **delete propably unwanted identities automatically**.
+* Set `$config['identity_from_directory_handle_proxyaddresses'] = true` to **support searching for alias addressen in Active Directory's `proxyAddresses` field**. It may contain a CSV string like `smtp:foo@exmaple.com,smtp:bar@example.net`.
 
 
 ## Compatibility

@@ -28,20 +28,20 @@ Nothing automated yet, therefore at least manual instructions:
 2. Determine the next version number. This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 3. Update the [`CHANGELOG.md`](./CHANGELOG.md). Insert a section for the new release. Do not forget the comparison link at the end of the file.
 4. If everything is fine: commit the changes, tag the release and push:
-   ```console
+   ```bash
    version="<FIXME version>"
    git tag "v${version}" <commit> -m "version ${version}"
    git show "v${version}"
    git push origin main --follow-tags
    ```
    If something minor went wrong (like missing `CHANGELOG.md` update), delete the tag and start over:
-   ```console
+   ```bash
    git tag -d "v${version}" # delete the old tag locally
    git push origin ":refs/tags/v${version}" # delete the old tag remotely
    ```
    This is *only* possible if there was no [GitHub release](https://github.com/foundata/roundcube-plugin-identity-from-directory/releases/). Use a new patch version number otherwise.
 5. Create a release tarball including all dependencies:
-   ```console
+   ```bash
    # define target version and stash unsaved work
    version="<FIXME version>"
    branch="$(git branch --show-current)"
@@ -77,16 +77,15 @@ Nothing automated yet, therefore at least manual instructions:
    git stash pop
    git branch --delete --force "v${version}-release"
    ```
-   `git archive` respects `.gitignore` as well as `.gitattributes`.
 6. Use [GitHub's release feature](https://github.com/foundata/roundcube-plugin-identity-from-directory/releases/new), select the tag you pushed and create a new release:
    * Use `v<version>` as title.
    * A description is optional. In doubt, use `See CHANGELOG.md for more information about this release.`.
 7. Check if the GitHub API delivers the correct version as `latest`:
-   ```console
+   ```bash
    curl -s -L https://api.github.com/repos/foundata/roundcube-plugin-identity-from-directory/releases/latest | jq -r '.tag_name' | sed -e 's/^v//g'
    ```
 8. Add the created release tarball as [additional asset](https://docs.github.com/en/enterprise-cloud@latest/rest/releases/assets#upload-a-release-asset) / file attachment:
-   ```console
+   ```bash
    github_api_token="FIXME"
    release_id="$(curl -s -L https://api.github.com/repos/foundata/roundcube-plugin-identity-from-directory/releases/latest | jq -r '.id')"
 
@@ -111,7 +110,7 @@ Nothing automated yet, therefore at least manual instructions:
    unset github_api_token
    ```
 9. Inform [Packist](https://packagist.org/) about the new release:
-   ```console
+   ```bash
    packagist_api_token="FIXME"
 
    curl -L \

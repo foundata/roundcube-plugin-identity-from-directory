@@ -23,7 +23,7 @@ A [Roundcube](https://roundcube.net/) [plugin](https://plugins.roundcube.net/) t
 
 Download the latest [`identity_from_directory-vX.Y.Z.tar.gz` tarball](https://github.com/foundata/roundcube-plugin-identity-from-directory/releases) (do not use the "Source code" archives Github creates automatically for each release). Extract it into `plugins/`, all source code files has to be in `plugins/identity_from_directory/` afterwards. Useful snippet if you have got a shell available on your target server:
 
-```console
+```bash
 # set Rouncube's installation path, adapt if needed
 roundcube_install_dir="/var/lib/roundcube"
 
@@ -46,7 +46,7 @@ cd "${roundcube_install_dir}/plugins" && tar -xzvf "/tmp/identity_from_directory
 
 The following command installs the plugin via [Composer](https://getcomposer.org/download/) into `plugins/identity_from_directory`:
 
-```console
+```bash
 php composer.phar require --update-no-dev -o "foundata/identity_from_directory:*"`
 ```
 
@@ -73,10 +73,12 @@ php composer.phar update --no-dev -o "foundata/identity_from_directory:*"`
 
 ## Configuration
 
-- Copy the template `config.inc.php.dist` to `config.inc.php` (Composer may already have done this for you)
-- Edit `plugins/identity_from_directory/config.inc.php` as you need. The inline comments in the file will help you with that.
+- Copy the template [`config.inc.php.dist`](./config.inc.php.dist) to `config.inc.php` (Composer may already have done this for you)
+- Edit `plugins/identity_from_directory/config.inc.php` as you need. The [inline comments](./config.inc.php.dist) describe every config value in detail.
 
-Please note that all **plugin actions are only triggered when loggin in**. So please logout and login again to test a new configuration.
+Please note that all **plugin actions are only triggered when loggin in**. So logout and login again to test a new configuration.
+
+This plugin is technically compatible with all values of Roundcube's `$config['identities_level']` config option. However, a value of `1` (possibility to edit all params but not the email address, user can add and delete identities in the UI) or `3` (possibility to edit all params but not the email address, user cannot add or delete identities in the UI) makes most sense. Please also have a look at the plugin config value `$config['identity_from_directory_deleteunmanaged']` if you want to delete propably unwanted identities automatically.
 
 
 ## Compatibility

@@ -82,13 +82,19 @@ class identity_from_directory extends rcube_plugin
                         }
                     } elseif ($ad_handle_proxyaddresses &&
                               preg_match('/^proxyaddresses($|:)/', $key)) {
-                        // parse Active Directory attribute proxyAddresses, CSV string like 'smtp:foo@exmaple.com,bar@example.net'
-                        $proxyaddresses = rcube_utils::explode(',', $ldap_entry[$key]);
+                        // Handle Active Directory attribute proxyAddresses, originally a CSV string
+                        // like 'smtp:foo@exmaple.com,bar@example.net'. Returned as string if there
+                        // is only one, returned as array if there are multiple.
+                        $proxyaddresses = $ldap_entry[$key];
+                        if (!is_array($proxyaddresses)) {
+                            $proxyaddresses = [ $proxyaddresses ];
+                        }
                         foreach ((array) $proxyaddresses as $alias) {
+                            $alias = trim($alias);
                             if (empty($alias)) {
                                 continue;
                             }
-                            $alias = preg_replace('/^smtp:(.+)/', '\1', $alias, 1);
+                            $alias = trim(preg_replace('/^smtp:(.+)/', '\1', $alias, 1));
                             if (strpos($alias, '@') !== false) {
                                 $args['email_list'][] = rcube_utils::idn_to_ascii($alias);
                             }

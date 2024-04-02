@@ -150,8 +150,8 @@ web: %website%
 
 
 // Active Directory only: Also search the 'proxyAddresses' field for email
-// alias addresses? This is an Actice Directory user attribute  which may
-// contain a CSV string like 'smtp:foo@exmaple.com,bar@example.net', listing
+// alias addresses? This is an Actice Directory user attribute which may
+// contain a CSV string like 'smtp:foo@exmaple.com,smtp:bar@example.net' with
 // alias email addresses (if any). The plugin will also maintain identities
 // for them if the following config value is set to true.
 $config['identity_from_directory_handle_proxyaddresses'] = false;

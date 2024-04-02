@@ -74,11 +74,14 @@ php composer.phar update --no-dev -o "foundata/identity_from_directory:*"`
 ## Configuration
 
 - Copy the template [`config.inc.php.dist`](./config.inc.php.dist) to `config.inc.php` (Composer may already have done this for you)
-- Edit `plugins/identity_from_directory/config.inc.php` as you need. The [inline comments](./config.inc.php.dist) describe every config value in detail.
+- Now edit `plugins/identity_from_directory/config.inc.php` as you need. The [inline comments](./config.inc.php.dist) describe every config value in detail.
 
-Please note that all **plugin actions are only triggered when loggin in**. So logout and login again to test a new configuration.
+Some additional notes:
 
-This plugin is technically compatible with all values of Roundcube's `$config['identities_level']` config option. However, a value of `1` (possibility to edit all params but not the email address, user can add and delete identities in the UI) or `3` (possibility to edit all params but not the email address, user cannot add or delete identities in the UI) makes most sense. Please also have a look at the plugin config value `$config['identity_from_directory_deleteunmanaged']` if you want to delete propably unwanted identities automatically.
+* All **plugin actions are only triggered during a user's login**. So logout and login again to test a new configuration.
+* This plugin is technically compatible with all values of Roundcube's `$config['identities_level']` config option. However, a value of `1` (user can edit all params but not the email address as well as add or delete identities in the UI) or `3` (user can edit all params but not the email address and cannot add or delete identities in the UI) usually makes most sense.
+* Set `$config['identity_from_directory_deleteunmanaged'] = true` if you want to delete propably unwanted identities automatically.
+* Set `$config['identity_from_directory_handle_proxyaddresses'] = true` to support searching for alias addressen in Active Directory's `proxyAddresses` field. It may contain a CSV string like `smtp:foo@exmaple.com,smtp:bar@example.net`.
 
 
 ## Compatibility

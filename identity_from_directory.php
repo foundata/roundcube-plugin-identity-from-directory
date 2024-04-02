@@ -133,7 +133,7 @@ class identity_from_directory extends rcube_plugin
         }
 
         $ldap_config = (array) $this->rc->config->get('identity_from_directory_ldap');
-        $handle_sigs = (bool) $this->rc->config->get('identity_from_directory_handlesignatures');
+        $handle_sigs = (bool) $this->rc->config->get('identity_from_directory_updatesignatures');
         $use_html_sig = (bool) $this->rc->config->get('identity_from_directory_htmlsignature');
         $wash_html_sig = (bool) $this->rc->config->get('identity_from_directory_washhtmlsignature');
         if ($use_html_sig) {

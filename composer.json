@@ -18,7 +18,7 @@
             "role": "Developer"
         }
     ],
-    "homepage": "https://github.com/foundata/roundcube-plugin-identity-from-directory/",
+    "homepage": "https://github.com/foundata/roundcube-plugin-identity-from-directory",
     "require": {
         "php": "^7.4 || ^8.0",
         "roundcube/plugin-installer": "^0.3"

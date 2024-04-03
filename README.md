@@ -53,7 +53,7 @@ would result in the following Roundcube identities after the user login:
 The following command installs the plugin via [Composer](https://getcomposer.org/download/) into `plugins/identity_from_directory`:
 
 ```bash
-php composer.phar require --update-no-dev -o "foundata/identity_from_directory:*"`
+php composer.phar require --update-no-dev -o "foundata/identity_from_directory:*"
 ```
 
 If you want to use the current development version from Git, use `-o "foundata/identity_from_directory:dev-main"`. Please confirm with `y` when Composer asks you whether you want to enable the plugin in the Roundcube configuration. Alternatively, add `identity_from_directory` to Roundcube's `$config['plugins']` array by hand.

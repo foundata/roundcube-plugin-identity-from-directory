@@ -145,9 +145,9 @@ class identity_from_directory extends rcube_plugin
         $use_html_sig = (bool) $this->rc->config->get('identity_from_directory_htmlsignature');
         $wash_html_sig = (bool) $this->rc->config->get('identity_from_directory_washhtmlsignature');
         if ($use_html_sig) {
-            $signature = (string) $this->rc->config->get('identity_from_directory_signature_template_html');
+            $signature_template = (string) $this->rc->config->get('identity_from_directory_signature_template_html');
         } else {
-            $signature = (string) $this->rc->config->get('identity_from_directory_signature_template_plaintext');
+            $signature_template = (string) $this->rc->config->get('identity_from_directory_signature_template_plaintext');
         }
         $sig_fallback_values = (array) $this->rc->config->get('identity_from_directory_fallbackvalues');
 
@@ -155,6 +155,7 @@ class identity_from_directory extends rcube_plugin
             $hook_to_use = 'identity_create';
             $identity_id = 0; // often called 'iid' in other parts of RC sources
             $is_standard = 0; // 1: use the identity as default (there can only be one)
+            $signature   = $signature_template; // copy signature template
 
             foreach ($identities as $identity) {
                 if ($identity['email'] === $email) {
@@ -185,7 +186,14 @@ class identity_from_directory extends rcube_plugin
                 // - %foo_url%: URL encoded value of field 'foo'
                 foreach (array_keys($ldap_config['fieldmap']) as $fieldmap_key) {
                     $replace_raw = '';
-                    if (array_key_exists($fieldmap_key, $user_data) && ((string) $user_data[$fieldmap_key] !== '')) {
+                    if ($fieldmap_key === 'email') {
+                        // Use the correct email address (alias) of the corresponding identity for
+                        // the %email%, %email_html% and %email_url% placeholders instead of the single
+                        // mapped value returned by the directory (which should be stored in
+                        // $user_data['user_email']). Otherwise, the same single email address value would
+                        // be used for all of the user's identities (even the one of alias addresses).
+                        $replace_raw = (string) $email;
+                    } elseif (array_key_exists($fieldmap_key, $user_data) && ((string) $user_data[$fieldmap_key] !== '')) {
                         $replace_raw = (string) $user_data[$fieldmap_key];
                     } elseif (array_key_exists($fieldmap_key, $sig_fallback_values) && ((string) $sig_fallback_values[$fieldmap_key] !== '')) {
                         $replace_raw = (string) $sig_fallback_values[$fieldmap_key];

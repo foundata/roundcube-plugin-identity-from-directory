@@ -147,6 +147,21 @@ $config['identity_from_directory_update_signatures'] = true;
 //
 // $config['identity_from_directory_signature_template_plaintext'] will be used
 // if $config['identity_from_directory_use_html_signature'] is false.
+//
+// On images in HTML signatures:
+// - The easiest way is the usage of base64 data URLs with e.g.
+//   data:image/png;base64,[...]:
+//   https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs
+//   Most mail user agents (MUAs) are supporting this but check if the all over
+//   compatibility is good enough for you:
+//   https://www.caniemail.com/features/image-base64/
+// - The second option are CID (or Content-ID) images. They work by attaching
+//   the image to the email you send and then using standard HTML image tags
+//   that reference that image to embed it in the email when the user opens it.
+//   Most MUAs are supporting this and Roundcube also provides and uses this
+//   functionality for HTML signatures. But tinkering out how to use it for
+//   this plugin and documenting is still an open issue (contributions welcome):
+//   https://github.com/foundata/roundcube-plugin-identity-from-directory/issues/3
 $config['identity_from_directory_signature_template_html'] = '
 <p>
     Kind regards<br />

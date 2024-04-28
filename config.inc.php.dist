@@ -82,7 +82,7 @@ $config['identity_from_directory_ldap'] = array(
 // optional fallback values which will be used if a LDAP attribute defined
 // in $config['identity_from_directory_ldap']['fieldmap'] provides no / empty
 // data. Just remove or add keys you do (not) need to have a fallback value for.
-$config['identity_from_directory_fallbackvalues'] = [
+$config['identity_from_directory_fallback_values'] = [
     'organization' => 'ACME Inc.',
     'phone' => '+49 123 123 123',
     //'fax' => '+49 123 123 999',
@@ -114,7 +114,7 @@ $config['identity_from_directory_update_signatures'] = true;
 // Signature templates
 // You can use each key from $config['identity_from_directory_ldap']['fieldmap']
 // as %placeholder(_html|url)%. They will be replaced with the values from the
-// either the directory or $config['identity_from_directory_fallbackvalues'] (if
+// either the directory or $config['identity_from_directory_fallback_values'] (if
 // there is no or empty data for this value in LDAP). Each value is available in
 // three ways (as provided by LDAP, with encoded HTML entities and URL encoded
 // for using it in URLs).

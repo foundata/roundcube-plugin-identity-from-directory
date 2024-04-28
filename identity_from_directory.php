@@ -149,7 +149,7 @@ class identity_from_directory extends rcube_plugin
         } else {
             $signature_template = (string) $this->rc->config->get('identity_from_directory_signature_template_plaintext');
         }
-        $sig_fallback_values = (array) $this->rc->config->get('identity_from_directory_fallbackvalues');
+        $signature_fallback_values = (array) $this->rc->config->get('identity_from_directory_fallback_values');
 
         foreach ((array) $user_data['email_list'] as $email) {
             $hook_to_use = 'identity_create';
@@ -180,7 +180,7 @@ class identity_from_directory extends rcube_plugin
 
             if ($update_signatures) {
                 // add signature to identity record, replace placeholders in a signature template with the values
-                // from LDAP or $config['identity_from_directory_fallbackvalues']:
+                // from LDAP or $config['identity_from_directory_fallback_values']:
                 // - %foo%: raw value of field 'foo'
                 // - %foo_html%: HTML entities encoded value of field 'foo'
                 // - %foo_url%: URL encoded value of field 'foo'
@@ -195,8 +195,8 @@ class identity_from_directory extends rcube_plugin
                         $replace_raw = (string) $email;
                     } elseif (array_key_exists($fieldmap_key, $user_data) && ((string) $user_data[$fieldmap_key] !== '')) {
                         $replace_raw = (string) $user_data[$fieldmap_key];
-                    } elseif (array_key_exists($fieldmap_key, $sig_fallback_values) && ((string) $sig_fallback_values[$fieldmap_key] !== '')) {
-                        $replace_raw = (string) $sig_fallback_values[$fieldmap_key];
+                    } elseif (array_key_exists($fieldmap_key, $signature_fallback_values) && ((string) $signature_fallback_values[$fieldmap_key] !== '')) {
+                        $replace_raw = (string) $signature_fallback_values[$fieldmap_key];
                     } elseif (array_key_exists($fieldmap_key, $identity_record) && ((string) $identity_record[$fieldmap_key] !== '')) {
                         $replace_raw = (string) $identity_record[$fieldmap_key];
                     } else {

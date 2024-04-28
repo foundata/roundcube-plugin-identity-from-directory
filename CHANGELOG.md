@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Renamed `$config['identity_from_directory_deleteunmanaged']` to `$config['identity_from_directory_delete_unmanaged']`.
 - Renamed `$config['identity_from_directory_updatesignatures']` to `$config['identity_from_directory_update_signatures']`.
+- Renamed `$config['identity_from_directory_fallbackvalues']` to `$config['identity_from_directory_fallback_values']`.
 
 
 

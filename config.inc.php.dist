@@ -1,6 +1,7 @@
 <?php
 
 // identity_from_directory plugin settings
+$config = [];
 
 // Parameters for connecting to and searching in LDAP or Active Directory.
 // A full example for Active Directory with the following characteristics
@@ -99,7 +100,7 @@ $config['identity_from_directory_fallbackvalues'] = [
 //        was added to a user's LDAP data. It makes sense to start with false
 //        to prevent unwanted deletions on running systems until you are sure
 //        that all identities should be defined by LDAP data, no matter what.
-$config['identity_from_directory_deleteunmanaged'] = false;
+$config['identity_from_directory_delete_unmanaged'] = false;
 
 
 // Switch for signature handling
@@ -167,6 +168,19 @@ $config['identity_from_directory_htmlsignature'] = true;
 // You can disable this if you got problems with stripped HTML attributes
 // and you are sure that one you trust the LDAP data.
 $config['identity_from_directory_washhtmlsignature'] = true;
+
+
+// Switch to overwrite the directory value for the %email_(_html|url)%
+// placeholders in signature templates with the email address from the identity
+//
+// true:
+//
+// false: Use the value returned from the directory defined in the field
+// $config['identity_from_directory_ldap']['fieldmap']['email'] in every case.
+// This means the %email_(_html|url)% placeholder in a signature template will
+// always be replaced with the same directory based value for all signatures
+// of all identities of the user.
+$config['identity_from_directory_ignore_emailfieldmap_placeholder'] = true;
 
 
 // In case of errors: Write LDAP search info, records and other useful

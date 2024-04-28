@@ -41,8 +41,8 @@ class identity_from_directory extends rcube_plugin
         if ($this->init_ldap([
             'mail_host' => $this->rc->user->data['mail_host'],
         ])) {
-            $debug_plugin = $this->rc->config->get('identity_from_directory_debug');
-            $ad_handle_proxyaddresses = $this->rc->config->get('identity_from_directory_handle_proxyaddresses');
+            $debug_plugin = (bool) $this->rc->config->get('identity_from_directory_debug');
+            $ad_handle_proxyaddresses = (bool) $this->rc->config->get('identity_from_directory_handle_proxyaddresses');
 
             // '*' does NOT search all fields but triggers the usage of 'search_fields' instead, see
             // https://github.com/roundcube/roundcubemail/blob/master/program/lib/Roundcube/rcube_ldap.php#L900C49-L900C62
@@ -139,7 +139,7 @@ class identity_from_directory extends rcube_plugin
             return $args;
         }
 
-        $debug_plugin = $this->rc->config->get('identity_from_directory_debug');
+        $debug_plugin = (bool) $this->rc->config->get('identity_from_directory_debug');
         $ldap_config = (array) $this->rc->config->get('identity_from_directory_ldap');
         $delete_unmanaged = (bool) $this->rc->config->get('identity_from_directory_delete_unmanaged');
         $update_signatures = (bool) $this->rc->config->get('identity_from_directory_update_signatures');
@@ -275,9 +275,9 @@ class identity_from_directory extends rcube_plugin
         $this->load_config('config.inc.php.dist'); // load the plugin's distribution config file as default
         $this->load_config(); // merge with local configuration file (which can overwrite any settings)
 
-        $debug_plugin = $this->rc->config->get('identity_from_directory_debug');
-        $debug_ldap = $this->rc->config->get('ldap_debug');
-        $mail_domain = $this->rc->config->mail_domain($args['mail_host']);
+        $debug_plugin = (bool) $this->rc->config->get('identity_from_directory_debug');
+        $debug_ldap = (bool) $this->rc->config->get('ldap_debug');
+        $mail_domain = (string) $this->rc->config->mail_domain($args['mail_host']);
 
         $ldap_config = (array) $this->rc->config->get('identity_from_directory_ldap');
         if (!array_key_exists('searchonly', $ldap_config)) {

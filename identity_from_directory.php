@@ -43,6 +43,7 @@ class identity_from_directory extends rcube_plugin
         ])) {
             $debug_plugin = (bool) $this->rc->config->get('identity_from_directory_debug');
             $ad_handle_proxyaddresses = (bool) $this->rc->config->get('identity_from_directory_handle_proxyaddresses');
+            $exclude_alias_regex = (string) $this->rc->config->get('identity_from_directory_exclude_alias_regex');
 
             // '*' does NOT search all fields but triggers the usage of 'search_fields' instead, see
             // https://github.com/roundcube/roundcubemail/blob/master/program/lib/Roundcube/rcube_ldap.php#L900C49-L900C62
@@ -76,9 +77,17 @@ class identity_from_directory extends rcube_plugin
                     // add email addresses (main, aliases) to to the list for the user
                     if (preg_match('/^email($|:)/', $key)) {
                         foreach ((array) $ldap_entry[$key] as $alias) {
-                            if (strpos($alias, '@')) {
-                                $args['email_list'][] = rcube_utils::idn_to_ascii($alias);
+                            $alias = trim($alias);
+                            if (empty($alias) || in_array($alias, $args['email_list'])) {
+                                continue;
                             }
+                            if (strpos($alias, '@') === false || (!empty($exclude_alias_regex) && (preg_match($exclude_alias_regex, $alias)))) {
+                                if ($debug_plugin) {
+                                    rcube::write_log('identity_from_directory_ldap', 'Excluded '. $alias . ' from handling as it is an invalid email address or matching "'. $exclude_alias_regex .'" (identity_from_directory_exclude_alias_regex).');
+                                }
+                                continue;
+                            }
+                            $args['email_list'][] = rcube_utils::idn_to_ascii($alias);
                         }
                     } elseif ($ad_handle_proxyaddresses &&
                               preg_match('/^proxyaddresses($|:)/', $key)) {
@@ -95,9 +104,16 @@ class identity_from_directory extends rcube_plugin
                                 continue;
                             }
                             $alias = trim(preg_replace('/^smtp:(.+)/', '\1', $alias, 1));
-                            if (strpos($alias, '@') !== false) {
-                                $args['email_list'][] = rcube_utils::idn_to_ascii($alias);
+                            if (empty($alias) || in_array($alias, $args['email_list'])) {
+                                continue;
                             }
+                            if (strpos($alias, '@') === false || (!empty($exclude_alias_regex) && (preg_match($exclude_alias_regex, $alias)))) {
+                                if ($debug_plugin) {
+                                    rcube::write_log('identity_from_directory_ldap', 'Excluded '. $alias . ' from handling as it is an invalid email address or matching "'. $exclude_alias_regex .'" (identity_from_directory_exclude_alias_regex).');
+                                }
+                                continue;
+                            }
+                            $args['email_list'][] = rcube_utils::idn_to_ascii($alias);
                         }
                     // add LDAP data as long as it does not overwrite already existing keys and exclude _ID, _raw_attrib etc.)
                     } elseif (strpos($key, '_') !== 0 && !array_key_exists($key, $args)) {

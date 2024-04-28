@@ -90,6 +90,27 @@ $config['identity_from_directory_fallback_values'] = [
 ];
 
 
+// Regular expression (used with preg_match()) to exclude email alias addresses
+// from handling.
+//
+// An empty string ('') disables the feature (=all of a user's email alias
+// addresses defined by the directory data will be handled).
+//
+// There are environments with unwanted but still needed email aliases. A good
+// example is a company re-branding including a domain change, where the
+// organization wants that users are not being able to use email addresses with
+// the old domain as identity in Roundcube but still needs to be able to receive
+// emails addressed to the old domain.
+//
+// Examples:
+// - '/^.+@example\.com$/im'
+//    Excludes all email addresses ending with "@example.com" (case insensitive).
+// - '/^.+@example\.(com|net|org)$/im'
+//   Excludes all email addresses ending with "@example.com", "@example.net" or
+//   "@example.org" (case insensitive)
+$config['identity_from_directory_exclude_alias_regex'] = '';
+
+
 // Switch to control if unmanaged identities should be deleted.
 // true: Delete all identities without a matching email address in the user's
 //       LDAP dataset. Recommended for automatic housekeeping in most

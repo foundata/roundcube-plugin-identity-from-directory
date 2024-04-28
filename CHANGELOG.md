@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+### Added
+
+- New option `$config['identity_from_directory_exclude_alias_regex']` to exclude propably unwanted identities for email alias addresses. (#6)
+
+
 ### Changed
 
 - ⚠ Admins have to take action / adapt config file: Renamed several config values for better readability:

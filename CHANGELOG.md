@@ -8,14 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Change
+### Changed
 
-- Renamed `$config['identity_from_directory_deleteunmanaged']` to `$config['identity_from_directory_delete_unmanaged']`.
-- Renamed `$config['identity_from_directory_updatesignatures']` to `$config['identity_from_directory_update_signatures']`.
-- Renamed `$config['identity_from_directory_fallbackvalues']` to `$config['identity_from_directory_fallback_values']`.
-- Renamed `$config['identity_from_directory_washhtmlsignature']` to `$config['identity_from_directory_wash_html_signature']`.
-- Renamed `$config['identity_from_directory_htmlsignature']` to `$config['identity_from_directory_use_html_signature']`.
-
+- ⚠ Admins have to take action / adapt config file: Renamed several config values for better readability:
+  * `$config['identity_from_directory_deleteunmanaged']` -> `$config['identity_from_directory_delete_unmanaged']`.
+  * `$config['identity_from_directory_fallbackvalues']` -> `$config['identity_from_directory_fallback_values']`.
+  * `$config['identity_from_directory_htmlsignature']` -> `$config['identity_from_directory_use_html_signature']`.
+  * `$config['identity_from_directory_updatesignatures']` -> `$config['identity_from_directory_update_signatures']`.
+  * `$config['identity_from_directory_washhtmlsignature']` -> `$config['identity_from_directory_wash_html_signature']`.
 
 
 ### Fixed

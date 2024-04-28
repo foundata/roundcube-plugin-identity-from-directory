@@ -170,19 +170,6 @@ $config['identity_from_directory_htmlsignature'] = true;
 $config['identity_from_directory_washhtmlsignature'] = true;
 
 
-// Switch to overwrite the directory value for the %email_(_html|url)%
-// placeholders in signature templates with the email address from the identity
-//
-// true:
-//
-// false: Use the value returned from the directory defined in the field
-// $config['identity_from_directory_ldap']['fieldmap']['email'] in every case.
-// This means the %email_(_html|url)% placeholder in a signature template will
-// always be replaced with the same directory based value for all signatures
-// of all identities of the user.
-$config['identity_from_directory_ignore_emailfieldmap_placeholder'] = true;
-
-
 // In case of errors: Write LDAP search info, records and other useful
 // debugging information into the Roundcube log "identity_from_directory_ldap".
 // You might want to set $config['ldap_debug'] = true for logging Roundcube's

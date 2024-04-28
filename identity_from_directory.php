@@ -142,9 +142,9 @@ class identity_from_directory extends rcube_plugin
         $ldap_config = (array) $this->rc->config->get('identity_from_directory_ldap');
         $delete_unmanaged = (bool) $this->rc->config->get('identity_from_directory_delete_unmanaged');
         $update_signatures = (bool) $this->rc->config->get('identity_from_directory_update_signatures');
-        $use_html_sig = (bool) $this->rc->config->get('identity_from_directory_htmlsignature');
+        $use_html_signature = (bool) $this->rc->config->get('identity_from_directory_use_html_signature');
         $wash_html_signature = (bool) $this->rc->config->get('identity_from_directory_wash_html_signature');
-        if ($use_html_sig) {
+        if ($use_html_signature) {
             $signature_template = (string) $this->rc->config->get('identity_from_directory_signature_template_html');
         } else {
             $signature_template = (string) $this->rc->config->get('identity_from_directory_signature_template_plaintext');
@@ -221,8 +221,8 @@ class identity_from_directory extends rcube_plugin
                                                 $replace_url, ], $signature);
                 }
 
-                $identity_record['html_signature'] = ($use_html_sig) ? 1 : 0;
-                $identity_record['signature'] = ($use_html_sig && $wash_html_signature) ? rcmail_action_settings_index::wash_html($signature) : $signature; // XSS protection
+                $identity_record['html_signature'] = ($use_html_signature) ? 1 : 0;
+                $identity_record['signature'] = ($use_html_signature && $wash_html_signature) ? rcmail_action_settings_index::wash_html($signature) : $signature; // XSS protection
             }
 
             $plugin = $this->rc->plugins->exec_hook($hook_to_use, [

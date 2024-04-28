@@ -125,7 +125,7 @@ $config['identity_from_directory_update_signatures'] = true;
 // - %foo_url%: URL encoded value of field 'foo'
 //
 // $config['identity_from_directory_signature_template_plaintext'] will be used
-// if $config['identity_from_directory_htmlsignature'] is false.
+// if $config['identity_from_directory_use_html_signature'] is false.
 $config['identity_from_directory_signature_template_html'] = '
 <p>
     Kind regards<br />
@@ -160,7 +160,7 @@ $config['identity_from_directory_handle_proxyaddresses'] = false;
 
 // Switch for signature format
 // true: use HTML instead of plain text signatures
-$config['identity_from_directory_htmlsignature'] = true;
+$config['identity_from_directory_use_html_signature'] = true;
 
 
 // Switch for signature sanitation

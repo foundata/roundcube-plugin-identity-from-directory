@@ -3,7 +3,7 @@
     "description": "Populate and maintain user identities automatically on each login, based on corresponding LDAP or Active Directory user data.",
     "license": "GPL-3.0-or-later",
     "type": "roundcube-plugin",
-    "version": "2.0.0",
+    "version": "v2.0.0",
     "keywords": [
         "identity",
         "signature",

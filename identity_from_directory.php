@@ -141,7 +141,7 @@ class identity_from_directory extends rcube_plugin
         $debug_plugin = $this->rc->config->get('identity_from_directory_debug');
         $ldap_config = (array) $this->rc->config->get('identity_from_directory_ldap');
         $delete_unmanaged = (bool) $this->rc->config->get('identity_from_directory_delete_unmanaged');
-        $update_sigs = (bool) $this->rc->config->get('identity_from_directory_updatesignatures');
+        $update_signatures = (bool) $this->rc->config->get('identity_from_directory_update_signatures');
         $use_html_sig = (bool) $this->rc->config->get('identity_from_directory_htmlsignature');
         $wash_html_sig = (bool) $this->rc->config->get('identity_from_directory_washhtmlsignature');
         if ($use_html_sig) {
@@ -178,7 +178,7 @@ class identity_from_directory extends rcube_plugin
                 'organization' => (array_key_exists('organization', $user_data) ? $user_data['organization'] : ''),
             ];
 
-            if ($update_sigs) {
+            if ($update_signatures) {
                 // add signature to identity record, replace placeholders in a signature template with the values
                 // from LDAP or $config['identity_from_directory_fallbackvalues']:
                 // - %foo%: raw value of field 'foo'

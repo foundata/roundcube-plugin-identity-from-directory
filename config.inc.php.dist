@@ -108,7 +108,7 @@ $config['identity_from_directory_delete_unmanaged'] = false;
 //       email and so on).
 // false: do not touch / overwrite the signature of an identity (so a user can
 //        still maintain the signature value and format in a self-reliant way)
-$config['identity_from_directory_updatesignatures'] = true;
+$config['identity_from_directory_update_signatures'] = true;
 
 
 // Signature templates

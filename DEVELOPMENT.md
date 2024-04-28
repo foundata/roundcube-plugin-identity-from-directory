@@ -35,7 +35,7 @@ Nothing automated yet, therefore at least manual instructions:
    git show "v${version}"
    git push origin main --follow-tags
    ```
-   If something minor went wrong (like missing `CHANGELOG.md` update), delete the tag and start over:
+   If something minor went wrong (like missing `CHANGELOG.md` or `composer.json` update), delete the tag and start over:
    ```bash
    git tag -d "v${version}" # delete the old tag locally
    git push origin ":refs/tags/v${version}" # delete the old tag remotely

@@ -8,7 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Nothing worth mentioning yet.
+### Fixed
+
+- Bugfix: the main email address from field mapping was used for `%email%`, `%email_url%` and `%email_html%` for every signature template, even for email alias addresses and their corresponding signatures.
+
 
 ## [1.1.1] - 2024-04-03
 

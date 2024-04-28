@@ -50,7 +50,7 @@ would result in the following Roundcube identities after the user login:
 
 ### Installation using Composer
 
-The following command installs the plugin via [Composer](https://getcomposer.org/download/) into `plugins/identity_from_directory`:
+The following command installs the [plugin package](https://packagist.org/packages/foundata/identity_from_directory) via [Composer](https://getcomposer.org/download/) into `plugins/identity_from_directory`:
 
 ```bash
 php composer.phar require --update-no-dev -o "foundata/identity_from_directory:*"
@@ -90,7 +90,7 @@ cd "${roundcube_install_dir}/plugins" && tar -xzvf "/tmp/identity_from_directory
 
 ### Update using Composer
 
-The following command updates the plugin via [Composer](https://getcomposer.org/download/):
+The following command updates the [plugin package](https://packagist.org/packages/foundata/identity_from_directory) via [Composer](https://getcomposer.org/download/):
 
 ```bash
 php composer.phar update --no-dev -o "foundata/identity_from_directory:*"`
@@ -111,12 +111,12 @@ Some additional notes:
 * All **plugin actions are only triggered during a user's login**. So logout and login again to test a new configuration.
 * This plugin is technically **compatible with all values of Roundcube's `$config['identities_level']`** config option. However, a value of `1` (user can edit all params but not the email address as well as add or delete identities in the UI) or `3` (user can edit all params but not the email address and cannot add or delete identities in the UI) makes most sense.
 * Set `$config['identity_from_directory_deleteunmanaged'] = true` if you want to **delete propably unwanted identities automatically**.
-* Set `$config['identity_from_directory_handle_proxyaddresses'] = true` to **support searching for alias addressen in Active Directory's `proxyAddresses` field**. It may contain a CSV string like `smtp:foo@exmaple.com,smtp:bar@example.net`.
+* Set `$config['identity_from_directory_handle_proxyaddresses'] = true` to **support searching for alias addresses in Active Directory's `proxyAddresses` field**. It may contain a CSV string like `smtp:foo@exmaple.com,smtp:bar@example.net`.
 
 
 ## Compatibility
 
-- Roundcube 1.6 or newer.
+- Roundcube 1.6 or higher.
 - PHP 7.4 or higher.
 - No special database requirements. This plugin does not adapt the database schema and is using Roundcube's built-in actions and hooks to handle the identity data.
 

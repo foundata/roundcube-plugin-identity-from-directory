@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * `$config['identity_from_directory_htmlsignature']` -> `$config['identity_from_directory_use_html_signature']`.
   * `$config['identity_from_directory_updatesignatures']` -> `$config['identity_from_directory_update_signatures']`.
   * `$config['identity_from_directory_washhtmlsignature']` -> `$config['identity_from_directory_wash_html_signature']`.
+- `config.inc.php.dist` (the plugin's distribution config file) will be loaded and then merged with local configuration file, which can overwrite any settings. This will make it easier to introduce new config values in the future.
 
 
 ### Fixed

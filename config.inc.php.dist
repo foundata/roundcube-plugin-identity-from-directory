@@ -167,7 +167,7 @@ $config['identity_from_directory_htmlsignature'] = true;
 // true: use rcmail_action_settings_index::wash_html() on HTML signatures.
 // You can disable this if you got problems with stripped HTML attributes
 // and you are sure that one you trust the LDAP data.
-$config['identity_from_directory_washhtmlsignature'] = true;
+$config['identity_from_directory_wash_html_signature'] = true;
 
 
 // In case of errors: Write LDAP search info, records and other useful

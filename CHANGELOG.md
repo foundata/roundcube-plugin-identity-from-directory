@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nothing worth mentioning yet.
 
 
+## [2.1.0] - 2024-05-02
+
+### Added
+
+- New option `$config['identity_from_directory_exclude_delete_unmanaged_regex']` to exclude identities from automatic cleanup if `$config['identity_from_directory_delete_unmanaged']` is `true`. (#7)
+
+
 ## [2.0.1] - 2024-04-28
 
 ### Added
@@ -66,8 +73,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All functionality and files.
 
 
-[unreleased]: https://github.com/foundata/roundcube-plugin-identity-from-directory/compare/v2.0.1...HEAD
-[2.0.0]: https://github.com/foundata/roundcube-plugin-identity-from-directory/releases/tag/v2.0.1
+[unreleased]: https://github.com/foundata/roundcube-plugin-identity-from-directory/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/foundata/roundcube-plugin-identity-from-directory/releases/tag/v2.1.0
+[2.0.1]: https://github.com/foundata/roundcube-plugin-identity-from-directory/releases/tag/v2.0.1
 [2.0.0]: https://github.com/foundata/roundcube-plugin-identity-from-directory/releases/tag/v2.0.0
 [1.1.1]: https://github.com/foundata/roundcube-plugin-identity-from-directory/releases/tag/v1.1.1
 [1.1.0]: https://github.com/foundata/roundcube-plugin-identity-from-directory/releases/tag/v1.1.0

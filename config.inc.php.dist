@@ -112,6 +112,7 @@ $config['identity_from_directory_exclude_alias_regex'] = '';
 
 
 // Switch to control if unmanaged identities should be deleted.
+//
 // true: Delete all identities without a matching email address in the user's
 //       LDAP dataset. Recommended for automatic housekeeping in most
 //       environments after everything is working for you as expected.
@@ -121,10 +122,34 @@ $config['identity_from_directory_exclude_alias_regex'] = '';
 //        was added to a user's LDAP data. It makes sense to start with false
 //        to prevent unwanted deletions on running systems until you are sure
 //        that all identities should be defined by LDAP data, no matter what.
+//
+// You can define exceptions from this automatic cleanup by using the
+// $config['identity_from_directory_exclude_delete_unmanaged_regex'] option.
+// This might be helpful for edge cases or when there are other plugins in use
+// which create / influence a user's identities.
 $config['identity_from_directory_delete_unmanaged'] = false;
 
 
+// Regular expression (used with preg_match()) to exclude email alias addresses
+// from automatic cleanup if $config['identity_from_directory_delete_unmanaged']
+// is true.
+//
+// An empty string ('') disables the feature (=all of a user's unmanaged email
+// alias addresses are getting deleted if). This setting has no effect if
+// $config['identity_from_directory_delete_unmanaged'] is set to false (as this
+// disables the whole automatic deletion / cleanup mechanism).
+//
+// Examples:
+// - '/^.+@example\.com$/im'
+//    Excludes all email addresses ending with "@example.com" (case insensitive).
+// - '/^.+@example\.(com|net|org)$/im'
+//   Excludes all email addresses ending with "@example.com", "@example.net" or
+//   "@example.org" (case insensitive)
+$config['identity_from_directory_exclude_delete_unmanaged_regex'] = '';
+
+
 // Switch for signature handling
+//
 // true: overwrite existing signatures on each login (not only name, organization,
 //       email and so on).
 // false: do not touch / overwrite the signature of an identity (so a user can
@@ -133,6 +158,7 @@ $config['identity_from_directory_update_signatures'] = true;
 
 
 // Signature templates
+//
 // You can use each key from $config['identity_from_directory_ldap']['fieldmap']
 // as %placeholder(_html|url)%. They will be replaced with the values from the
 // either the directory or $config['identity_from_directory_fallback_values'] (if

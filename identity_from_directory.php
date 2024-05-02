@@ -158,6 +158,7 @@ class identity_from_directory extends rcube_plugin
         $debug_plugin = (bool) $this->rc->config->get('identity_from_directory_debug');
         $ldap_config = (array) $this->rc->config->get('identity_from_directory_ldap');
         $delete_unmanaged = (bool) $this->rc->config->get('identity_from_directory_delete_unmanaged');
+        $exclude_delete_unmanaged_regex = (string) $this->rc->config->get('identity_from_directory_exclude_delete_unmanaged_regex');
         $update_signatures = (bool) $this->rc->config->get('identity_from_directory_update_signatures');
         $use_html_signature = (bool) $this->rc->config->get('identity_from_directory_use_html_signature');
         $wash_html_signature = (bool) $this->rc->config->get('identity_from_directory_wash_html_signature');
@@ -260,12 +261,20 @@ class identity_from_directory extends rcube_plugin
             $identities_count = count($identities);
             foreach ($identities as $identity) {
                 if ($identities_count > 1 && !(in_array($identity['email'], $user_data['email_list']))) {
+
+                    if (!empty($exclude_delete_unmanaged_regex) && preg_match($exclude_delete_unmanaged_regex, $identity['email'])) {
+                        if ($debug_plugin) {
+                            rcube::write_log('identity_from_directory_ldap', 'Excluded identity '. $identity['identity_id'] .' of user '.  $this->rc->user->data['username'] .' from automatic deletion. It\'s email '. $identity['email'] .' is not listed in the directory but matching "'. $exclude_delete_unmanaged_regex .'" (identity_from_directory_exclude_delete_unmanaged_regex).');
+                        }
+                        continue;
+                    }
+
                     if ($debug_plugin) {
-                        rcube::write_log('identity_from_directory_ldap', 'Deleting identity '. $identity['identity_id']. ' of user '.  $this->rc->user->data['username'] .' because it\'s email '. $identity['email'] .' is the not listed in the directory.');
+                        rcube::write_log('identity_from_directory_ldap', 'Deleting identity '. $identity['identity_id'] .' of user '.  $this->rc->user->data['username'] .' because it\'s email '. $identity['email'] .' is the not listed in the directory.');
                     }
 
                     if (!($this->rc->user->delete_identity($identity['identity_id'])) && $debug_plugin) {
-                        rcube::write_log('identity_from_directory_ldap', 'Could note delete identity '. $identity['identity_id']. ' for email '. $identity['email']);
+                        rcube::write_log('identity_from_directory_ldap', 'Could note delete identity '. $identity['identity_id'] .' for email '. $identity['email']);
                     }
                     $identities_count--;
                 }

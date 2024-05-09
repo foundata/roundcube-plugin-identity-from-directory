@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Nothing worth mentioning yet.
+- Renamed the debug log from `identity_from_directory_ldap` to `identity_from_directory`. It was for LDAP results when development started but contains additional log data nowdays.
 
 
 ## [2.1.0] - 2024-05-02

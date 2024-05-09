@@ -49,13 +49,13 @@ class identity_from_directory extends rcube_plugin
             // https://github.com/roundcube/roundcubemail/blob/master/program/lib/Roundcube/rcube_ldap.php#L900C49-L900C62
             //
             // This 'search_fields' array gets set to the plugin's $config['identity_from_directory_ldap']['search_fields']
-            // as connection property by $this->init_ldap(). So searching in '*' limits the field to the plugin's config.
+            // as connection property by $this->init_ldap(). So searching in '*' limits the fields to the plugin's config.
             $results = $this->ldap->search('*', $args['user'], true);
 
             if (count($results->records) === 1) {
                 $ldap_entry = $results->records[0];
                 if ($debug_plugin) {
-                    rcube::write_log('identity_from_directory_ldap', 'Found a record for' . $args['user'] . ': '.print_r($ldap_entry, true));
+                    rcube::write_log('identity_from_directory', 'Found a record for' . $args['user'] . ': '.print_r($ldap_entry, true));
                 }
 
                 $user_name = is_array($ldap_entry['name']) ? $ldap_entry['name'][0] : $ldap_entry['name'];
@@ -83,7 +83,7 @@ class identity_from_directory extends rcube_plugin
                             }
                             if (strpos($alias, '@') === false || (!empty($exclude_alias_regex) && (preg_match($exclude_alias_regex, $alias)))) {
                                 if ($debug_plugin) {
-                                    rcube::write_log('identity_from_directory_ldap', 'Excluded '. $alias . ' from handling as it is an invalid email address or matching "'. $exclude_alias_regex .'" (identity_from_directory_exclude_alias_regex).');
+                                    rcube::write_log('identity_from_directory', 'Excluded '. $alias . ' from handling as it is an invalid email address or matching "'. $exclude_alias_regex .'" (identity_from_directory_exclude_alias_regex).');
                                 }
                                 continue;
                             }
@@ -109,7 +109,7 @@ class identity_from_directory extends rcube_plugin
                             }
                             if (strpos($alias, '@') === false || (!empty($exclude_alias_regex) && (preg_match($exclude_alias_regex, $alias)))) {
                                 if ($debug_plugin) {
-                                    rcube::write_log('identity_from_directory_ldap', 'Excluded '. $alias . ' from handling as it is an invalid email address or matching "'. $exclude_alias_regex .'" (identity_from_directory_exclude_alias_regex).');
+                                    rcube::write_log('identity_from_directory', 'Excluded '. $alias . ' from handling as it is an invalid email address or matching "'. $exclude_alias_regex .'" (identity_from_directory_exclude_alias_regex).');
                                 }
                                 continue;
                             }
@@ -125,7 +125,7 @@ class identity_from_directory extends rcube_plugin
                 $args['email_default'] = $args['user_email'];
 
             } elseif ($debug_plugin && count($results->records) > 1) {
-               rcube::write_log('identity_from_directory_ldap', 'Searching for ' . $args['user'] . ' returned more then one result, all where ignored as unambiguous assignment is not possible.');
+               rcube::write_log('identity_from_directory', 'Searching for ' . $args['user'] . ' returned more then one result, all where ignored as unambiguous assignment is not possible.');
             }
         }
 
@@ -264,17 +264,17 @@ class identity_from_directory extends rcube_plugin
 
                     if (!empty($exclude_delete_unmanaged_regex) && preg_match($exclude_delete_unmanaged_regex, $identity['email'])) {
                         if ($debug_plugin) {
-                            rcube::write_log('identity_from_directory_ldap', 'Excluded identity '. $identity['identity_id'] .' of user '.  $this->rc->user->data['username'] .' from automatic deletion. It\'s email '. $identity['email'] .' is not listed in the directory but matching "'. $exclude_delete_unmanaged_regex .'" (identity_from_directory_exclude_delete_unmanaged_regex).');
+                            rcube::write_log('identity_from_directory', 'Excluded identity '. $identity['identity_id'] .' of user '.  $this->rc->user->data['username'] .' from automatic deletion. It\'s email '. $identity['email'] .' is not listed in the directory but matching "'. $exclude_delete_unmanaged_regex .'" (identity_from_directory_exclude_delete_unmanaged_regex).');
                         }
                         continue;
                     }
 
                     if ($debug_plugin) {
-                        rcube::write_log('identity_from_directory_ldap', 'Deleting identity '. $identity['identity_id'] .' of user '.  $this->rc->user->data['username'] .' because it\'s email '. $identity['email'] .' is the not listed in the directory.');
+                        rcube::write_log('identity_from_directory', 'Deleting identity '. $identity['identity_id'] .' of user '.  $this->rc->user->data['username'] .' because it\'s email '. $identity['email'] .' is the not listed in the directory.');
                     }
 
                     if (!($this->rc->user->delete_identity($identity['identity_id'])) && $debug_plugin) {
-                        rcube::write_log('identity_from_directory_ldap', 'Could note delete identity '. $identity['identity_id'] .' for email '. $identity['email']);
+                        rcube::write_log('identity_from_directory', 'Could note delete identity '. $identity['identity_id'] .' for email '. $identity['email']);
                     }
                     $identities_count--;
                 }
@@ -315,7 +315,7 @@ class identity_from_directory extends rcube_plugin
             empty($ldap_config['search_fields']) ||
             empty($ldap_config['fieldmap'])) {
             if ($debug_plugin) {
-                rcube::write_log('identity_from_directory_ldap', 'The plugin config seems to be invalid, please check $config[\'identity_from_directory_ldap\'].');
+                rcube::write_log('identity_from_directory', 'The plugin config seems to be invalid, please check $config[\'identity_from_directory_ldap\'].');
             }
             return false;
         }
@@ -323,7 +323,7 @@ class identity_from_directory extends rcube_plugin
             !array_key_exists('email', $ldap_config['fieldmap']) ||
             !array_key_exists('organization', $ldap_config['fieldmap'])) {
             if ($debug_plugin) {
-                rcube::write_log('identity_from_directory_ldap', 'The plugin config seems to be invalid, please check $config[\'identity_from_directory_ldap\'][\'fieldmap\'].');
+                rcube::write_log('identity_from_directory', 'The plugin config seems to be invalid, please check $config[\'identity_from_directory_ldap\'][\'fieldmap\'].');
             }
             return false;
         }

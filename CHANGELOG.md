@@ -8,7 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
 - Renamed the debug log from `identity_from_directory_ldap` to `identity_from_directory`. It was for LDAP results when development started but contains additional log data nowdays.
+- General code cleanup (e7142af)
+
+
+### Fixed
+
+- Correct handling of addresses with IDN domains and comparisons if capitalization of the same email addresses is not consistent. (#8)
 
 
 ## [2.1.0] - 2024-05-02

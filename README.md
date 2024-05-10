@@ -34,10 +34,10 @@ $config['identity_from_directory_signature_template_html'] = '
     %organization_html%
 </p>
 <p>
-    mailto: <a href="mailto:%email_html%">%email_html%</a><br />
+    mailto: <a href="mailto:%email_url%">%email_html%</a><br />
     phone: <a href="tel:%phone_url%">%phone_html%</a><br />
     fax: <a href="tel:%fax_url%">%fax_html%</a><br />
-    web: <a href="%website_html%">%website_html%</a>
+    web: <a href="%website_url%">%website_html%</a>
 </p>';
 ```
 

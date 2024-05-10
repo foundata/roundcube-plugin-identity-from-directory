@@ -21,11 +21,6 @@ class identity_from_directory extends rcube_plugin
     {
         $this->rc = rcmail::get_instance();
 
-        // Triggered when a somebody logs in the first time and a local user is created.
-        // https://github.com/roundcube/roundcubemail/wiki/Plugin-Hooks#user_create
-        // This plugin is using it to create the first, main identity
-        $this->add_hook('user_create', [$this, 'lookup_user_name']);
-
         // Triggered after a user successfully logged in
         // https://github.com/roundcube/roundcubemail/wiki/Plugin-Hooks#login_after
         // This plugin is using it to update / edit existing identities
@@ -34,51 +29,55 @@ class identity_from_directory extends rcube_plugin
 
 
     /**
-     * 'user_create' hook handler, used to grab and prepare the user data from LDAP
+     * 'login_after' hook handler, used to create or update the user identities
      */
-    public function lookup_user_name($args)
+    public function login_after($args)
     {
+        $this->load_config('config.inc.php.dist'); // load the plugin's distribution config file as default
+        $this->load_config(); // merge with local configuration file (which can overwrite any settings)
+
+        if ($this->ldap) {
+            return $args;
+        }
+
+        // get user's data from directory and prepare it for further processing
+        $user_data = array();
+        $debug_plugin = (bool) $this->rc->config->get('identity_from_directory_debug');
+        $ad_handle_proxyaddresses = (bool) $this->rc->config->get('identity_from_directory_handle_proxyaddresses');
+        $exclude_alias_regex = (string) $this->rc->config->get('identity_from_directory_exclude_alias_regex');
         if ($this->init_ldap([
             'mail_host' => $this->rc->user->data['mail_host'],
         ])) {
-            $debug_plugin = (bool) $this->rc->config->get('identity_from_directory_debug');
-            $ad_handle_proxyaddresses = (bool) $this->rc->config->get('identity_from_directory_handle_proxyaddresses');
-            $exclude_alias_regex = (string) $this->rc->config->get('identity_from_directory_exclude_alias_regex');
-
             // '*' does NOT search all fields but triggers the usage of 'search_fields' instead, see
             // https://github.com/roundcube/roundcubemail/blob/master/program/lib/Roundcube/rcube_ldap.php#L900C49-L900C62
             //
             // This 'search_fields' array gets set to the plugin's $config['identity_from_directory_ldap']['search_fields']
             // as connection property by $this->init_ldap(). So searching in '*' limits the fields to the plugin's config.
-            $results = $this->ldap->search('*', $args['user'], true);
+            $results = $this->ldap->search('*', $this->rc->user->data['username'], true);
 
             if (count($results->records) === 1) {
                 $ldap_entry = $results->records[0];
                 if ($debug_plugin) {
-                    rcube::write_log('identity_from_directory', 'Found a record for' . $args['user'] . ': '.print_r($ldap_entry, true));
+                    rcube::write_log('identity_from_directory', 'Found a record for' . $this->rc->user->data['username'] . ': '.print_r($ldap_entry, true));
                 }
 
-                $user_name = is_array($ldap_entry['name']) ? $ldap_entry['name'][0] : $ldap_entry['name'];
-                $user_email = is_array($ldap_entry['email']) ? $ldap_entry['email'][0] : $ldap_entry['email'];
-
-                $args['user_name'] = $user_name;
-                $args['email_list'] = [];
-                $args['email_default'] = '';
-
-                if (empty($args['user_email']) && strpos($user_email, '@')) {
-                    $args['user_email'] = rcube_utils::idn_to_ascii($user_email);
+                $user_data['user_name'] = is_array($ldap_entry['name']) ? $ldap_entry['name'][0] : $ldap_entry['name'];
+                $user_data['user_email'] = is_array($ldap_entry['email']) ? $ldap_entry['email'][0] : $ldap_entry['email'];
+                $user_data['email_list'] = [];
+                if (strpos($user_data['user_email'], '@') !== false) {
+                    $user_data['user_email'] = rcube_utils::idn_to_ascii($user_data['user_email']);
                 }
-
-                if (!empty($args['user_email'])) {
-                    $args['email_list'][] = $args['user_email'];
+                if (!empty($user_data['user_email'])) {
+                    $user_data['email_list'][] = $user_data['user_email'];
                 }
+                $user_data['email_default'] = $user_data['user_email'];
 
                 foreach (array_keys($ldap_entry) as $key) {
                     // add email addresses (main, aliases) to the list for the user
                     if (preg_match('/^email($|:)/', $key)) {
                         foreach ((array) $ldap_entry[$key] as $alias) {
                             $alias = trim($alias);
-                            if (empty($alias) || in_array($alias, $args['email_list'])) {
+                            if (empty($alias) || in_array($alias, $user_data['email_list'])) {
                                 continue;
                             }
                             if (strpos($alias, '@') === false || (!empty($exclude_alias_regex) && (preg_match($exclude_alias_regex, $alias)))) {
@@ -87,7 +86,7 @@ class identity_from_directory extends rcube_plugin
                                 }
                                 continue;
                             }
-                            $args['email_list'][] = rcube_utils::idn_to_ascii($alias);
+                            $user_data['email_list'][] = rcube_utils::idn_to_ascii($alias);
                         }
                     } elseif ($ad_handle_proxyaddresses &&
                               preg_match('/^proxyaddresses($|:)/', $key)) {
@@ -104,7 +103,7 @@ class identity_from_directory extends rcube_plugin
                                 continue;
                             }
                             $alias = trim(preg_replace('/^smtp:(.+)/', '\1', $alias, 1));
-                            if (empty($alias) || in_array($alias, $args['email_list'])) {
+                            if (empty($alias) || in_array($alias, $user_data['email_list'])) {
                                 continue;
                             }
                             if (strpos($alias, '@') === false || (!empty($exclude_alias_regex) && (preg_match($exclude_alias_regex, $alias)))) {
@@ -113,49 +112,24 @@ class identity_from_directory extends rcube_plugin
                                 }
                                 continue;
                             }
-                            $args['email_list'][] = rcube_utils::idn_to_ascii($alias);
+                            $user_data['email_list'][] = rcube_utils::idn_to_ascii($alias);
                         }
                     // add LDAP data but exclude _ID, _raw_attrib etc. and do not overwrite already existing keys
-                    } elseif (strpos($key, '_') !== 0 && !array_key_exists($key, $args)) {
-                        $args[$key] = $ldap_entry[$key];
+                    } elseif (strpos($key, '_') !== 0 && !array_key_exists($key, $user_data)) {
+                        $user_data[$key] = $ldap_entry[$key];
                     }
                 }
-
-                $args['email_list'] = array_unique($args['email_list']);
-                $args['email_default'] = $args['user_email'];
+                $user_data['email_list'] = array_unique($user_data['email_list']);
 
             } elseif ($debug_plugin && count($results->records) > 1) {
-               rcube::write_log('identity_from_directory', 'Searching for ' . $args['user'] . ' returned more then one result, all where ignored as unambiguous assignment is not possible.');
+               rcube::write_log('identity_from_directory', 'Searching for ' . $this->rc->user->data['username'] . ' returned more than one result, all were ignored as unambiguous assignment is not possible.');
             }
         }
-
-        return $args;
-    }
-
-
-    /**
-     * 'login_after' hook handler, used to create or update the user identities
-     */
-    public function login_after($args)
-    {
-        $this->load_config('config.inc.php.dist'); // load the plugin's distribution config file as default
-        $this->load_config(); // merge with local configuration file (which can overwrite any settings)
-
-        if ($this->ldap) {
+        if (!array_key_exists('email_list', $user_data) || empty($user_data['email_list'])) {
             return $args;
         }
 
-        $identities = $this->rc->user->list_emails();
-        $user_data = $this->lookup_user_name([
-            'user' => $this->rc->user->data['username'],
-            'mail_host' => $this->rc->user->data['mail_host'],
-        ]);
-
-        if (empty($user_data['email_list'])) {
-            return $args;
-        }
-
-        $debug_plugin = (bool) $this->rc->config->get('identity_from_directory_debug');
+        // get config and other data needed for further processing
         $ldap_config = (array) $this->rc->config->get('identity_from_directory_ldap');
         $delete_unmanaged = (bool) $this->rc->config->get('identity_from_directory_delete_unmanaged');
         $exclude_delete_unmanaged_regex = (string) $this->rc->config->get('identity_from_directory_exclude_delete_unmanaged_regex');
@@ -168,7 +142,9 @@ class identity_from_directory extends rcube_plugin
             $signature_template = (string) $this->rc->config->get('identity_from_directory_signature_template_plaintext');
         }
         $signature_fallback_values = (array) $this->rc->config->get('identity_from_directory_fallback_values');
+        $identities = $this->rc->user->list_emails();
 
+        // maintain an identity for each of the user's determined email addresses
         foreach ((array) $user_data['email_list'] as $email) {
             $hook_to_use = 'identity_create';
             $identity_id = 0; // often called 'iid' in other parts of RC sources
@@ -257,6 +233,7 @@ class identity_from_directory extends rcube_plugin
             }
         }
 
+        // delete identities which are not managed by this plugin
         if ($delete_unmanaged) {
             $identities_count = count($identities);
             foreach ($identities as $identity) {

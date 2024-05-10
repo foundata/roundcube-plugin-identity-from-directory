@@ -74,7 +74,7 @@ class identity_from_directory extends rcube_plugin
                 }
 
                 foreach (array_keys($ldap_entry) as $key) {
-                    // add email addresses (main, aliases) to to the list for the user
+                    // add email addresses (main, aliases) to the list for the user
                     if (preg_match('/^email($|:)/', $key)) {
                         foreach ((array) $ldap_entry[$key] as $alias) {
                             $alias = trim($alias);
@@ -115,7 +115,7 @@ class identity_from_directory extends rcube_plugin
                             }
                             $args['email_list'][] = rcube_utils::idn_to_ascii($alias);
                         }
-                    // add LDAP data as long as it does not overwrite already existing keys and exclude _ID, _raw_attrib etc.)
+                    // add LDAP data but exclude _ID, _raw_attrib etc. and do not overwrite already existing keys
                     } elseif (strpos($key, '_') !== 0 && !array_key_exists($key, $args)) {
                         $args[$key] = $ldap_entry[$key];
                     }

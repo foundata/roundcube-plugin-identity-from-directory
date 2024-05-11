@@ -11,6 +11,7 @@ Nothing special or automated yet. Therefore just some hints for manual testing:
 * Run the plugin with technically valid config values but a directory without the needed data.
 * Create identities with dummy data for a user upfront and activate the plugin afterwards. Check the updates after login.
 * Add new email addresses to the user's dataset in the directory and check if new identities are created properly.
+* Test the cleanup feature: manually add new identities with unmanaged email addresses via WebUI and check if they are getting deleted correctly and/or if the exclude feature works as expected.
 
 
 ## Composer, PHP dependencies
@@ -31,8 +32,12 @@ Nothing automated yet, therefore at least manual instructions:
 5. If everything is fine: commit the changes, tag the release and push:
    ```bash
    version="<FIXME version>"
-   git tag "v${version}" <commit> -m "version ${version}"
+   git add "./CHANGELOG.md" "./composer.json"
+   git commit -m "Release preparations: v${version}"
+
+   git tag "v${version}" <commit-id> -m "version ${version}"
    git show "v${version}"
+
    git push origin main --follow-tags
    ```
    If something minor went wrong (like missing `CHANGELOG.md` or `composer.json` update), delete the tag and start over:

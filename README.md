@@ -98,7 +98,7 @@ php composer.phar update --no-dev -o "foundata/identity_from_directory:*"`
 
 ### Update from release tarball
 
-Updating is as simple as overwriting the existing files. Just follow the [installation instructions](#installation) again to get the newest release. This should be a low-risk operation as there were no backwards-compatibility-breaking releases yet and there are no database schema changes.
+Updating is as simple as overwriting the existing files. Just follow the [installation instructions](#installation) again to get the newest release. This should be a low-risk operation as there are no database schema changes performed by this plugin and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The [changelog](./CHANGELOG.md) will inform you of any manual actions required during an upgrade, typically only necessary for major version increments.
 
 
 ## Configuration

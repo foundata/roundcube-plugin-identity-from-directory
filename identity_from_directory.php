@@ -153,7 +153,6 @@ class identity_from_directory extends rcube_plugin
             $hook_to_use = 'identity_create';
             $identity_id = 0; // often called 'iid' in other parts of RC sources
             $is_standard = 0; // 1: use the identity as default (there can only be one)
-            $signature   = $signature_template; // copy signature template
 
             foreach ($identities_existing as $identity_existing) {
                 // case-insensitive search to update an existing identity, even if
@@ -179,8 +178,11 @@ class identity_from_directory extends rcube_plugin
             ];
 
             if ($update_signatures) {
-                // add signature to identity record, replace placeholders in a signature template with the values
-                // from LDAP or $config['identity_from_directory_fallback_values']:
+                // copy signature template
+                $signature = $signature_template;
+
+                // add signature to identity record, replace placeholders in a signature template with
+                // the values from LDAP or $config['identity_from_directory_fallback_values']:
                 // - %foo%: raw value of field 'foo'
                 // - %foo_html%: HTML entities encoded value of field 'foo'
                 // - %foo_url%: URL encoded value of field 'foo'. Additional optimizations are

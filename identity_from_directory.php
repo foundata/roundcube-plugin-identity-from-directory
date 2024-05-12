@@ -188,21 +188,21 @@ class identity_from_directory extends rcube_plugin
                 // - %foo_url%: URL encoded value of field 'foo'. Additional optimizations are
                 //   applied for the fields 'email' (usage of Punycode for email domains),
                 //   'phone' and 'fax' (stripping of chars not compatible with tel:// URLs)
-                foreach (array_keys($ldap_config['fieldmap']) as $fieldmap_key) {
+                foreach (array_keys($ldap_config['fieldmap']) as $placeholder) {
                     $replace_raw = '';
-                    if ($fieldmap_key === 'email') {
+                    if ($placeholder === 'email') {
                         // Use the correct email address (alias) of the corresponding identity for
                         // the %email%, %email_html% and %email_url% placeholders instead of the
                         // single mapped value returned by the directory (which should be stored in
                         // $user_data['email']). Otherwise, the same single email address value would
                         // be used for all of the user's identities (even the one of alias addresses).
                         $replace_raw = (string) $email;
-                    } elseif (array_key_exists($fieldmap_key, $user_data) && ((string) $user_data[$fieldmap_key] !== '')) {
-                        $replace_raw = (string) $user_data[$fieldmap_key];
-                    } elseif (array_key_exists($fieldmap_key, $signature_fallback_values) && ((string) $signature_fallback_values[$fieldmap_key] !== '')) {
-                        $replace_raw = (string) $signature_fallback_values[$fieldmap_key];
-                    } elseif (array_key_exists($fieldmap_key, $identity_record) && ((string) $identity_record[$fieldmap_key] !== '')) {
-                        $replace_raw = (string) $identity_record[$fieldmap_key];
+                    } elseif (array_key_exists($placeholder, $user_data) && ((string) $user_data[$placeholder] !== '')) {
+                        $replace_raw = (string) $user_data[$placeholder];
+                    } elseif (array_key_exists($placeholder, $signature_fallback_values) && ((string) $signature_fallback_values[$placeholder] !== '')) {
+                        $replace_raw = (string) $signature_fallback_values[$placeholder];
+                    } elseif (array_key_exists($placeholder, $identity_record) && ((string) $identity_record[$placeholder] !== '')) {
+                        $replace_raw = (string) $identity_record[$placeholder];
                     } else {
                         continue;
                     }
@@ -211,19 +211,19 @@ class identity_from_directory extends rcube_plugin
                     $replace_html = htmlspecialchars($replace_raw, \ENT_NOQUOTES, RCUBE_CHARSET);
 
                     $replace_url = '';
-                    if ($fieldmap_key === 'phone' || $fieldmap_key === 'fax') {
+                    if ($placeholder === 'phone' || $placeholder === 'fax') {
                         // strip some chars for "tel://" URL usage
                         $replace_url = urlencode(preg_replace('/[^+0-9]+/', '', $replace_raw));
-                    } elseif ($fieldmap_key === 'email') {
+                    } elseif ($placeholder === 'email') {
                         // use Punycode/ACE for "mailto://" URL usage
                         $replace_url = urlencode(rcube_utils::idn_to_ascii($replace_raw));
                     } else {
                         $replace_url = urlencode($replace_raw);
                     }
 
-                    $signature = str_replace([ '%'. $fieldmap_key . '%',
-                                               '%'. $fieldmap_key . '_html%',
-                                               '%'. $fieldmap_key . '_url%' ],
+                    $signature = str_replace([ '%'. $placeholder . '%',
+                                               '%'. $placeholder . '_html%',
+                                               '%'. $placeholder . '_url%' ],
                                              [ $replace_raw,
                                                $replace_html,
                                                $replace_url ], $signature);

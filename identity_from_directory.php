@@ -45,6 +45,7 @@ class identity_from_directory extends rcube_plugin
             'name' => '',
             'email' => '', // default / main email address; IDN domains (no Punycode/ACE)
             'email_list' => [], // list of all email addresses (main, default, aliases); IDN domains (no Punycode/ACE)
+            'managed_identity_ids' => [] // list of IDs of identities managed by this plugin
         ];
         if ($this->init_ldap([
             'mail_host' => $this->rc->user->data['mail_host'],
@@ -240,11 +241,26 @@ class identity_from_directory extends rcube_plugin
 
             if (!$plugin['abort'] && !empty($plugin['record']['email'])) {
                 if ($identity_id === 0) {
-                    $this->rc->user->insert_identity($plugin['record']);
+                    $identity_id = $this->rc->user->insert_identity($plugin['record']);
                 } else {
                     $this->rc->user->update_identity($identity_id, $plugin['record']);
                 }
             }
+
+            if (empty($identity_id)) {
+                if ($debug_plugin) {
+                    rcube::write_log('identity_from_directory',
+                        'The identity for user \'' . $this->rc->user->data['username'] . '\' '
+                        . 'could not be saved' . (!empty($plugin['message']) ? ' ( ' . $plugin['message'] . ' ): ' : ': ')
+                        . print_r($identity_record, true));
+                }
+                continue;
+            }
+
+            // Store the ID of the identity as managed. Any optionally needed cleanup
+            // action gets a lot easier if there is a list of identities known to be
+            // managed for the current user by this plugin.
+            $user_data['managed_identity_ids'][] = $identity_id;
         }
 
         // delete identities which are not managed by this plugin
@@ -254,19 +270,15 @@ class identity_from_directory extends rcube_plugin
             $identity_existing_count = count($identities_existing);
             foreach ($identities_existing as $identity_existing) {
 
-                if ($identity_existing_count > 1 &&
-                    // do NOT normalize email address here (e.g. via mb_strtolower(), trim(), and/or
-                    // rcube_utils::idn_to_utf8()). Otherwise, some identities to be cleaned up
-                    // would not be detected (e.g. leftovers with differences in only upper or lower
-                    // case characters or Punycode/ACE in domain names)
-                    !(in_array($identity_existing['email'], $user_data['email_list']))) {
+                if ($identity_existing_count > 1 && !(in_array($identity_existing['identity_id'], $user_data['managed_identity_ids']))) {
+
                     if (!empty($exclude_delete_unmanaged_regex) && preg_match($exclude_delete_unmanaged_regex, $identity_existing['email'])) {
                         if ($debug_plugin) {
                             rcube::write_log('identity_from_directory',
                                 'Excluded identity ' . $identity_existing['identity_id'] . ' of user '
-                                . $this->rc->user->data['username'] . ' from automatic deletion. It\'s email '
-                                . $identity_existing['email'] . ' is not listed in the directory but matching "'
-                                . $exclude_delete_unmanaged_regex
+                                . $this->rc->user->data['username'] . ' from automatic deletion even '
+                                . 'though it is not managed by this plugin; it\'s email address '
+                                . $identity_existing['email'] . ' is matching "' . $exclude_delete_unmanaged_regex
                                 . '" (identity_from_directory_exclude_delete_unmanaged_regex).');
                         }
                         continue;
@@ -274,17 +286,17 @@ class identity_from_directory extends rcube_plugin
 
                     if ($debug_plugin) {
                         rcube::write_log('identity_from_directory',
-                            'Deleting identity '. $identity_existing['identity_id'] .' of user '
-                            . $this->rc->user->data['username'] .' because it\'s email '
-                            . $identity_existing['email'] . ' is the not listed in the directory.');
+                            'Deleting identity '. $identity_existing['identity_id'] .' with email address '
+                            . $identity_existing['email'] . ' because it is not managed by this plugin.');
                     }
 
                     if (!($this->rc->user->delete_identity($identity_existing['identity_id'])) && $debug_plugin) {
                         rcube::write_log('identity_from_directory',
                             'Could note delete identity '. $identity_existing['identity_id']
-                            . ' for email '.$identity_existing['email']);
+                            . ' with email address '.$identity_existing['email']);
                     }
                     $identity_existing_count--;
+
                 }
 
             }

@@ -182,8 +182,8 @@ class identity_from_directory extends rcube_plugin
                 // copy signature template
                 $signature = $signature_template;
 
-                // add signature to identity record, replace placeholders in a signature template with
-                // the values from LDAP or $config['identity_from_directory_fallback_values']:
+                // add signature to identity record, replace placeholders in the signature template with
+                // the values from the directory or $config['identity_from_directory_fallback_values']:
                 // - %foo%: raw value of field 'foo'
                 // - %foo_html%: HTML entities encoded value of field 'foo'
                 // - %foo_url%: URL encoded value of field 'foo'. Additional optimizations are

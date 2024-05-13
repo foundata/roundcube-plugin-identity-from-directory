@@ -10,21 +10,21 @@ $config = [];
 //    You can specify more than one as it is an array. They will be tried one after
 //    another.
 // 2. Use the "roundcube-svc" user located in the OU "service-accounts" to
-//    bind / connect (bind_dn) with a password (bind_pass).
+//    bind/connect (bind_dn) with a password (bind_pass).
 // 3. Search in all organization units below DC=contoso,DC=com (base_dn, scope).
 // 4. Search only for active non-system user accounts (filter).
 // 5. Search in the directory object attributes "mail" and "sAMAccountName"
 //    (search_fields) for the username of the current Roundcube username
-//    ($this->rc->user->data['username']).
+//    ($this->rc->user->data['username'] will be used by this plugin).
 // 6. Define which directory object attributes to use for the Roundcube identity
 //    values and signature placeholders (fieldmap, the array keys are the names
 //    of the Roundcube values, the array values are the corresponding directory
 //    attribute names to grab the data from).
 //
-// would result in the following plugin config value:
+// This would result in the following plugin config value:
 //
 // $config['identity_from_directory_ldap'] = [
-//   'hosts' => ['ldaps://dc01.contoso.com:636'],
+//   'hosts' => [ 'ldaps://dc01.contoso.com:636' ],
 //   'base_dn' => 'DC=contoso,DC=com',
 //   'bind_dn' => 'CN=roundcube-svc,OU=service-accounts,DC=contoso,DC=com',
 //   'bind_pass' => 'password-of-service-user-defined-in-bind_dn',
@@ -79,8 +79,8 @@ $config['identity_from_directory_ldap'] = [
 ];
 
 
-// optional fallback values which will be used if a LDAP attribute defined
-// in $config['identity_from_directory_ldap']['fieldmap'] provides no / empty
+// optional fallback values that will be used if a LDAP attribute defined
+// in $config['identity_from_directory_ldap']['fieldmap'] provides no or empty
 // data. Just remove or add keys you do (not) need to have a fallback value for.
 $config['identity_from_directory_fallback_values'] = [
     'organization' => 'ACME Inc.',
@@ -104,56 +104,63 @@ $config['identity_from_directory_fallback_values'] = [
 //
 // Examples:
 // - '/^.+@example\.com$/im'
-//    Excludes all email addresses ending with "@example.com" (case insensitive).
+//    Excludes all email addresses ending with "@example.com" (not case
+//    sensitive).
 // - '/^.+@example\.(com|net|org)$/im'
 //   Excludes all email addresses ending with "@example.com", "@example.net" or
-//   "@example.org" (case insensitive)
+//   "@example.org" (case-insensitive)
 $config['identity_from_directory_exclude_alias_regex'] = '';
 
 
 // Switch to control if unmanaged identities should be deleted.
 //
 // true: Delete all identities without a matching email address in the user's
-//       LDAP dataset. Recommended for automatic housekeeping in most
-//       environments after everything is working for you as expected.
-// false: Do not delete identities if there is no fitting email address in
-//        in LDAP. These identities will stay untouched until users delete them
-//        by themselves or the identity gets updated because the email addresses
-//        was added to a user's LDAP data. It makes sense to start with false
-//        to prevent unwanted deletions on running systems until you are sure
-//        that all identities should be defined by LDAP data, no matter what.
+// directory dataset (= identities not maintained by this plugin). Strongly
+// recommended for automatic housekeeping in most environments once everything
+// is working as expected.
+//
+// false: Do not delete unmanaged identities (= identities with no fitting
+// email address in the directory record of the user). These identities will
+// remain untouched until users delete them themselves or the identity gets
+// updated because the email address was added to a user's directory data.
+//
+// It makes sense to start testing with false to prevent unwanted deletions on
+// running systems until you are sure that all identities should be defined by
+// the user's directory data.
 //
 // You can define exceptions from this automatic cleanup by using the
 // $config['identity_from_directory_exclude_delete_unmanaged_regex'] option.
-// This might be helpful for edge cases or when there are other plugins in use
-// which create / influence a user's identities.
+// This might be helpful for edge cases or when other plugins are in use
+// that create or influence a user's identities.
 $config['identity_from_directory_delete_unmanaged'] = false;
 
 
-// Regular expression (used with preg_match()) to exclude email alias addresses
-// from automatic cleanup if $config['identity_from_directory_delete_unmanaged']
-// is true.
+// Regular expression (used with preg_match()) to exclude identities with
+// matching email addresses from automatic cleanup when
+// $config['identity_from_directory_delete_unmanaged'] is true.
 //
-// An empty string ('') disables the feature (=all of a user's unmanaged email
-// alias addresses are getting deleted if). This setting has no effect if
+// An empty string ('') disables the exclusion feature (= all of a user's
+// unmanaged identities are deleted). This setting has no effect if
 // $config['identity_from_directory_delete_unmanaged'] is set to false (as this
-// disables the whole automatic deletion / cleanup mechanism).
+// disables the entire automatic deletion cleanup mechanism).
 //
 // Examples:
 // - '/^.+@example\.com$/im'
-//    Excludes all email addresses ending with "@example.com" (case insensitive).
+//    Excludes all identities using email addresses ending with "@example.com"
+//    (case-insensitive).
 // - '/^.+@example\.(com|net|org)$/im'
-//   Excludes all email addresses ending with "@example.com", "@example.net" or
-//   "@example.org" (case insensitive)
+//    Excludes all identities using email addresses ending with "@example.com",
+//    "@example.net" or "@example.org" (case-insensitive)
 $config['identity_from_directory_exclude_delete_unmanaged_regex'] = '';
 
 
 // Switch for signature handling
 //
-// true: overwrite existing signatures on each login (not only name, organization,
-//       email and so on).
-// false: do not touch / overwrite the signature of an identity (so a user can
-//        still maintain the signature value and format in a self-reliant way)
+// true: Overwrite existing signatures on each login (not only name, organization,
+// email and other attributes).
+//
+// false: Do not touch or overwrite the signature of an identity (so a user can
+// still maintain the signature value and format in a self-reliant way).
 $config['identity_from_directory_update_signatures'] = true;
 
 
@@ -161,17 +168,17 @@ $config['identity_from_directory_update_signatures'] = true;
 //
 // You can use each key from $config['identity_from_directory_ldap']['fieldmap']
 // as %placeholder(_html|url)%. They will be replaced with the values from the
-// either the directory or $config['identity_from_directory_fallback_values'] (if
-// there is no or empty data for this value in LDAP). Each value is available in
-// three ways (as provided by LDAP, with encoded HTML entities and URL encoded
+// either the directory or $config['identity_from_directory_fallback_values']
+// (if there is no or empty data for this key in LDAP). Each value is available
+// in three ways (as provided by LDAP, with encoded HTML entities and URL encoded
 // for using it in URLs).
 //
 // Example for 'foo':
-// - %foo%: raw value of field 'foo'
-// - %foo_html%: HTML entities encoded value of field 'foo'
-// - %foo_url%: URL encoded value of field 'foo'. Additional optimizations are
-//   applied for the fields 'email' (usage of Punycode for email domains),
-//   'phone' and 'fax' (stripping of chars not compatible with tel:// URLs)
+// - %foo%: raw value of 'foo'
+// - %foo_html%: HTML entities encoded value of 'foo'
+// - %foo_url%: URL encoded value of 'foo'. Additional optimizations are
+//   applied it the key is named 'email' (usage of Punycode for email domains),
+//   'phone' or 'fax' (stripping of chars not compatible with tel:// URLs)
 //
 // $config['identity_from_directory_signature_template_plaintext'] will be used
 // if $config['identity_from_directory_use_html_signature'] is false.
@@ -214,21 +221,31 @@ web: %website%
 ';
 
 
-// Active Directory only: Also search the 'proxyAddresses' field for email
-// alias addresses? This is an Active Directory user attribute which may
-// contain a CSV string like 'smtp:foo@example.com,smtp:bar@example.net' with
-// alias email addresses (if any). The plugin will also maintain identities
-// for them if the following config value is set to true.
+// Switch: Also search the 'proxyAddresses' field for email alias addresses?
+//
+// 'proxyAddresses' is a Active Directory user attribute which may contain
+// a CSV string like 'smtp:foo@example.com,smtp:bar@example.net' or an
+// array with such values. They represent alias email addresses (if any).
+// The directory server needs to provide this field (which is the default
+// for MS Active Directory but not for most other LDAP servers out there;
+// Therefore this option defaults to false).
+//
+// true: The plugin will also maintain identities for email aliases in
+// 'proxyAddresses' (if any).
+//
+// false: Do not care about email aliases in 'proxyAddresses'.
 $config['identity_from_directory_handle_proxyaddresses'] = false;
 
 
 // Switch for signature format
-// true: use HTML instead of plain text signatures
+//
+// true: use HTML instead of plain text signatures.
 $config['identity_from_directory_use_html_signature'] = true;
 
 
 // Switch for signature sanitation
-// true: use rcmail_action_settings_index::wash_html() on HTML signatures.
+//
+// true: Use rcmail_action_settings_index::wash_html() on HTML signatures.
 // You can disable this if you got problems with stripped HTML attributes
 // and you are sure that you can trust the LDAP data in any case.
 $config['identity_from_directory_wash_html_signature'] = true;
@@ -236,6 +253,7 @@ $config['identity_from_directory_wash_html_signature'] = true;
 
 // Switch for logging additional debug data into the Roundcube log
 // "identity_from_directory".
+//
 // true: Write LDAP search info, records and other useful debugging info into
 // the log file. You might want to also set $config['ldap_debug'] = true for
 // logging Roundcube's LDAP conversations, including the ones triggered by

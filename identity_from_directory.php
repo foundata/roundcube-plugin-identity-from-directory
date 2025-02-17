@@ -4,7 +4,7 @@
  * Maintains a user's identities from a central directory on each login.
  *
  * @license SPDX-License-Identifier: GPL-3.0-or-later
- * @copyright SPDX-FileCopyrightText: foundata GmbH <https://foundata.com>
+ * @copyright SPDX-FileCopyrightText: foundata GmbH (https://foundata.com)
  */
 class identity_from_directory extends rcube_plugin
 {

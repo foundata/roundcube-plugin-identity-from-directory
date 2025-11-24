@@ -52,7 +52,7 @@ $config['identity_from_directory_ldap'] = [
     'bind_pass' => 'password-of-service-user-defined-in-bind_dn',
     'scope' => 'sub', // available search modes: sub|base|list
     'filter' => '(&(sAMAccountType=805306368)(!(servicePrincipalName=*))(!(isCriticalSystemObject=TRUE))(!(userAccountControl:1.2.840.113556.1.4.803:=2)))',
-    'search_fields' => ['mail', 'sAMAccountName'],
+    'search_fields' => 'mail', 'sAMAccountName',
     // fieldmap:
     // - key: value name in Roundcube
     // - values: corresponding attribute name in your LDAP

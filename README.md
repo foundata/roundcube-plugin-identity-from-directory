@@ -1,4 +1,6 @@
-# Roundcube Plugin: `identity_from_directory` (use LDAP or AD to maintain email identities)
+# Roundcube Plugin: `identity_from_directory`
+
+**Use LDAP or AD to maintain email identities.**
 
 A [Roundcube](https://roundcube.net/) [plugin](https://plugins.roundcube.net/) to populate and maintain a user's email identities automatically on each login, based on corresponding LDAP or Active Directory data.
 

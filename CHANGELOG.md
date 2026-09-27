@@ -24,68 +24,90 @@ and the project adheres to
 
 ### Changed
 
-- Renamed the debug log from `identity_from_directory_ldap` to `identity_from_directory`. It was for LDAP results when development started but contains additional log data nowdays.
+- Renamed the debug log from `identity_from_directory_ldap` to
+  `identity_from_directory`. It was for LDAP results when development started
+  but contains additional log data nowdays.
 - General code cleanup (e7142af)
 
 
 ### Fixed
 
-- Correct handling of addresses with IDN domains and comparisons if capitalization of the same email addresses is not consistent. (#8)
+- Correct handling of addresses with IDN domains and comparisons if
+  capitalization of the same email addresses is not consistent. (#8)
 
 
 ## [2.1.0] - 2024-05-02
 
 ### Added
 
-- New option `$config['identity_from_directory_exclude_delete_unmanaged_regex']` to exclude identities from automatic cleanup if `$config['identity_from_directory_delete_unmanaged']` is `true`. (#7)
+- New option `$config['identity_from_directory_exclude_delete_unmanaged_regex']`
+  to exclude identities from automatic cleanup if
+  `$config['identity_from_directory_delete_unmanaged']` is `true`. (#7)
 
 
 ## [2.0.1] - 2024-04-28
 
 ### Added
 
-- Documentation about images in HTML signatures. Sadly, examples for CID (or Content-ID) images are still missing. (#3)
+- Documentation about images in HTML signatures. Sadly, examples for CID (or
+  Content-ID) images are still missing. (#3)
 
 
 ## [2.0.0] - 2024-04-28
 
 ### Added
 
-- New option `$config['identity_from_directory_exclude_alias_regex']` to exclude propably unwanted identities for email alias addresses. (#6)
+- New option `$config['identity_from_directory_exclude_alias_regex']` to exclude
+  propably unwanted identities for email alias addresses. (#6)
 
 
 ### Changed
 
-- ⚠ Admins have to take action / adapt config file: Renamed several config values for better readability:
-  * `$config['identity_from_directory_deleteunmanaged']` -> `$config['identity_from_directory_delete_unmanaged']`.
-  * `$config['identity_from_directory_fallbackvalues']` -> `$config['identity_from_directory_fallback_values']`.
-  * `$config['identity_from_directory_htmlsignature']` -> `$config['identity_from_directory_use_html_signature']`.
-  * `$config['identity_from_directory_updatesignatures']` -> `$config['identity_from_directory_update_signatures']`.
-  * `$config['identity_from_directory_washhtmlsignature']` -> `$config['identity_from_directory_wash_html_signature']`.
-- `config.inc.php.dist` (the plugin's distribution config file) will be loaded and then merged with local configuration file, which can overwrite any settings. This will make it easier to introduce new config values in the future.
+- ⚠ Admins have to take action / adapt config file: Renamed several config
+  values for better readability:
+  - `$config['identity_from_directory_deleteunmanaged']` ->
+    `$config['identity_from_directory_delete_unmanaged']`.
+  - `$config['identity_from_directory_fallbackvalues']` ->
+    `$config['identity_from_directory_fallback_values']`.
+  - `$config['identity_from_directory_htmlsignature']` ->
+    `$config['identity_from_directory_use_html_signature']`.
+  - `$config['identity_from_directory_updatesignatures']` ->
+    `$config['identity_from_directory_update_signatures']`.
+  - `$config['identity_from_directory_washhtmlsignature']` ->
+    `$config['identity_from_directory_wash_html_signature']`.
+- `config.inc.php.dist` (the plugin's distribution config file) will be loaded
+  and then merged with local configuration file, which can overwrite any
+  settings. This will make it easier to introduce new config values in the
+  future.
 
 
 ### Fixed
 
-- The main email address from field mapping was used for `%email%`, `%email_url%` and `%email_html%` for every signature template, even for email alias addresses and their corresponding signatures. (#5)
+- The main email address from field mapping was used for `%email%`,
+  `%email_url%` and `%email_html%` for every signature template, even for email
+  alias addresses and their corresponding signatures. (#5)
 
 
 ## [1.1.1] - 2024-04-03
 
 ### Fixed
 
-- Fixed an error if `$config['identity_from_directory_handle_proxyaddresses']` is set to `true` and there is more then one alias address stored in the user's `proxyAddresses` field (Active Directory only).
+- Fixed an error if `$config['identity_from_directory_handle_proxyaddresses']`
+  is set to `true` and there is more then one alias address stored in the user's
+  `proxyAddresses` field (Active Directory only).
 
 
 ## [1.1.0] - 2024-04-03
 
 ### Added
 
-- New option `$config['identity_from_directory_deleteunmanaged']` to delete propably unwanted identities automatically.
+- New option `$config['identity_from_directory_deleteunmanaged']` to delete
+  propably unwanted identities automatically.
 
 ### Changed
 
-- Renamed `$config['identity_from_directory_handlesignatures']` to `$config['identity_from_directory_updatesignatures']`.
+- Renamed `$config['identity_from_directory_handlesignatures']` to
+  `$config['identity_from_directory_updatesignatures']`.
 
 
 ## [1.0.0] - 2024-03-28

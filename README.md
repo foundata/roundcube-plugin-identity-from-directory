@@ -181,8 +181,7 @@ PHP 8.x, which the plugin is most tested with.
 ## Licensing, copyright<a id="licensing-copyright"></a>
 
 <!--REUSE-IgnoreStart-->
-<!-- rumdl-disable MD034 -->
-<!-- Plain URL retained in the copyright notice for plain-text reuse. -->
+<!-- rumdl-disable MD034 --><!-- should match SPDX-PackageSupplier -->
 Copyright (c) 2024, [foundata GmbH](https://foundata.com/)
 (https://foundata.com)
 <!-- rumdl-enable MD034 -->

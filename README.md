@@ -125,7 +125,7 @@ Some additional notes:
 The plugin may work with older versions then listed above, but this is not tested nor supported. We recommend using the latest stable Roundcube version and PHP 8.x, which the plugin is most tested with.
 
 
-## Licensing, copyright
+## Licensing, copyright<a id="licensing-copyright"></a>
 
 <!--REUSE-IgnoreStart-->
 <!-- rumdl-disable MD034 -->
@@ -141,6 +141,6 @@ The [`REUSE.toml`](REUSE.toml) file provides detailed licensing and copyright in
 [![REUSE status](https://api.reuse.software/badge/github.com/foundata/roundcube-plugin-identity-from-directory)](https://api.reuse.software/info/github.com/foundata/roundcube-plugin-identity-from-directory)
 
 
-## Author information
+## Author information<a id="author-information"></a>
 
 This [project](https://foundata.com/en/projects/) was created and is maintained by [foundata](https://foundata.com/). If you like it, you might [buy them a coffee](https://buy-me-a.coffee/roundcube-plugin-identity-from-directory/). The plugin was heavily inspired by the [`new_user_identity` plugin](https://github.com/roundcube/roundcubemail/tree/master/plugins/new_user_identity).

@@ -21,7 +21,7 @@ There is no public discussion or forum. If you have something to discuss or comm
 
 ## Pull Requests (PRs)
 
-Make sure you read [`DEVELOPMENT.md`](./DEVELOPMENT.md), especially the [encoding section](./DEVELOPMENT.md#encoding). Make sure:
+Make sure you read [`DEVELOPMENT.md`](./DEVELOPMENT.md), especially the [miscellaneous section](./DEVELOPMENT.md#miscellaneous). Make sure:
 
 1. That all source code or other components are compatible with the project's [licensing](./README.md#licensing-copyright) and are traceable. Otherwise, we cannot accept your contribution.
 2. Your code is working / fix the problem / introduce a sane new feature.

@@ -4,6 +4,20 @@
 
 A [Roundcube](https://roundcube.net/) [plugin](https://plugins.roundcube.net/) to populate and maintain a user's email identities automatically on each login, based on corresponding LDAP or Active Directory data.
 
+<!-- rumdl-disable MD033 -->
+<!-- HTML for consistent rendering across limited platform parsers -->
+<div align="center" id="project-readme-header">
+<br>
+<br>
+
+**⭐ Found this useful? Support open-source and star this project:**
+
+[![GitHub repository](https://img.shields.io/github/stars/foundata/roundcube-plugin-identity-from-directory.svg)](https://github.com/foundata/roundcube-plugin-identity-from-directory)
+
+<br>
+</div>
+<!-- rumdl-enable MD033 -->
+
 
 ## Table of Contents
 

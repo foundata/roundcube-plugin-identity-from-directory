@@ -182,7 +182,7 @@ PHP 8.x, which the plugin is most tested with.
 
 <!--REUSE-IgnoreStart-->
 <!-- rumdl-disable MD034 --><!-- should match SPDX-PackageSupplier -->
-Copyright (c) 2024, [foundata GmbH](https://foundata.com/)
+Copyright (c) 2024-2026, [foundata GmbH](https://foundata.com/)
 (https://foundata.com)
 <!-- rumdl-enable MD034 -->
 

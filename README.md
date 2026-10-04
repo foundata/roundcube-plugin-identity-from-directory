@@ -210,6 +210,9 @@ Third-party trademarks used in this repository:
 
 - Active Directory® is a trademark of Microsoft Corporation, registered in the
   European Union and the United States.
+- Roundcube® is a trademark of Innovento GmbH,
+  [owned by Nextcloud](https://nextcloud.com/blog/press_releases/roundcube-joins-nextcloud/)
+  CEO Frank Karlitschek, registered in the European Union.
 
 Their use here is purely descriptive and does not imply any affiliation with or
 endorsement by the trademark holders.

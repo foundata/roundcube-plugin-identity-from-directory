@@ -164,6 +164,19 @@ $config['identity_from_directory_exclude_delete_unmanaged_regex'] = '';
 $config['identity_from_directory_update_signatures'] = true;
 
 
+// Switch for signature creation on missing signatures
+//
+// true: Create signatures only if the corresponding identity currently has no
+// signature (empty). This allows users to customize their signature after the
+// initial creation without it being overwritten on subsequent logins.
+//
+// false: Do not create signatures if signature updates are disabled.
+//
+// Note: If $config['identity_from_directory_update_signatures'] is true, then
+// signatures are overwritten on each login regardless of this option.
+$config['identity_from_directory_create_signatures'] = false;
+
+
 // Signature templates
 //
 // You can use each key from $config['identity_from_directory_ldap']['fieldmap']

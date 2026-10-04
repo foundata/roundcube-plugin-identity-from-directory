@@ -139,6 +139,7 @@ class identity_from_directory extends rcube_plugin
         // get config and other data needed for further processing
         $ldap_config = (array) $this->rc->config->get('identity_from_directory_ldap');
         $update_signatures = (bool) $this->rc->config->get('identity_from_directory_update_signatures');
+        $create_signatures = (bool) $this->rc->config->get('identity_from_directory_create_signatures');
         $use_html_signature = (bool) $this->rc->config->get('identity_from_directory_use_html_signature');
         $wash_html_signature = (bool) $this->rc->config->get('identity_from_directory_wash_html_signature');
         if ($use_html_signature) {
@@ -178,7 +179,26 @@ class identity_from_directory extends rcube_plugin
                 'organization' => (array_key_exists('organization', $user_data) ? $user_data['organization'] : ''),
             ];
 
+            // Decide whether to set/overwrite the signature
+            // - update_signatures: always overwrite
+            // - create_signatures: set only if the current identity has an empty signature
+            $should_set_signature = false;
             if ($update_signatures) {
+                $should_set_signature = true;
+            } elseif ($create_signatures) {
+                if ($identity_id === 0) {
+                    // New identity => signature is missing
+                    $should_set_signature = true;
+                } elseif (method_exists($this->rc->user, 'get_identity')) {
+                    $existing_identity = $this->rc->user->get_identity($identity_id);
+                    if (is_array($existing_identity) && array_key_exists('signature', $existing_identity)) {
+                        $existing_signature = (string) $existing_identity['signature'];
+                        $should_set_signature = (trim($existing_signature) === '');
+                    }
+                }
+            }
+
+            if ($should_set_signature) {
                 // copy signature template
                 $signature = $signature_template;
 
